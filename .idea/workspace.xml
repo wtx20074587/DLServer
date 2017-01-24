@@ -20,11 +20,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="readme.txt" pinned="false" current-in-tab="true">
+      <file leaf-file-name="readme.txt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Landlords/readme.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="46" column="24" selection-start-line="46" selection-start-column="24" selection-end-line="46" selection-end-column="24" />
+            <state relative-caret-position="396">
+              <caret line="54" column="19" selection-start-line="54" selection-start-column="19" selection-end-line="54" selection-end-column="19" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="config.json" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Landlords/config.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="363">
+              <caret line="70" column="32" selection-start-line="70" selection-start-column="32" selection-end-line="70" selection-end-column="32" />
               <folding />
             </state>
           </provider>
@@ -174,24 +184,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="database" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DLServer" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DLServer" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Landlords" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -412,7 +404,7 @@
         <state relative-caret-position="110">
           <caret line="5" column="18" selection-start-line="5" selection-start-column="18" selection-end-line="5" selection-end-column="18" />
           <folding>
-            <element signature="e#13#41#0" expanded="true" />
+            <element signature="e#13#41#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -430,7 +422,7 @@
         <state relative-caret-position="20790">
           <caret line="945" column="21" selection-start-line="945" selection-start-column="21" selection-end-line="945" selection-end-column="21" />
           <folding>
-            <element signature="e#23#129#0" expanded="true" />
+            <element signature="e#23#129#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -440,7 +432,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#82#174#0" expanded="true" />
+            <element signature="e#82#174#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -466,7 +458,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="12" />
           <folding>
-            <element signature="e#13#29#0" expanded="true" />
+            <element signature="e#13#29#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -561,7 +553,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="12" />
           <folding>
-            <element signature="e#13#29#0" expanded="true" />
+            <element signature="e#13#29#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -587,7 +579,7 @@
         <state relative-caret-position="88">
           <caret line="5" column="18" selection-start-line="5" selection-start-column="18" selection-end-line="5" selection-end-column="18" />
           <folding>
-            <element signature="e#13#41#0" expanded="true" />
+            <element signature="e#13#41#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -605,7 +597,7 @@
         <state relative-caret-position="20702">
           <caret line="945" column="21" selection-start-line="945" selection-start-column="21" selection-end-line="945" selection-end-column="21" />
           <folding>
-            <element signature="e#23#129#0" expanded="true" />
+            <element signature="e#23#129#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -617,28 +609,28 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Landlords/config.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1848">
-          <caret line="84" column="8" selection-start-line="84" selection-start-column="8" selection-end-line="84" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Landlords/models/sysModel.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="440">
           <caret line="389" column="25" selection-start-line="389" selection-start-column="25" selection-end-line="389" selection-end-column="25" />
           <folding>
-            <element signature="e#82#174#0" expanded="true" />
+            <element signature="e#82#174#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Landlords/readme.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="46" column="24" selection-start-line="46" selection-start-column="24" selection-end-line="46" selection-end-column="24" />
+        <state relative-caret-position="396">
+          <caret line="54" column="19" selection-start-line="54" selection-start-column="19" selection-end-line="54" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Landlords/config.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="363">
+          <caret line="70" column="32" selection-start-line="70" selection-start-column="32" selection-end-line="70" selection-end-column="32" />
           <folding />
         </state>
       </provider>
