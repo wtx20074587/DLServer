@@ -53,8 +53,7 @@ class MysqlObject(object):
 							#charset = mainConfig['charset']) # deleted by wtx 20170109
 					__conn.setdefault(x+'_main', dbpool.connection())
 
-					'''
-					#wtx-start@20170123@(1)不需要从数据库(2)下面的原代码中使用mainConfig，配置错了
+					#wtx-start@20170123@(1)不需要从数据库(2)下面的原代码中使用mainConfig，也就是主从数据库使用同一个数据库
 					queryConfig = self.dbConfig.get(x).get('query')				#从数据库
 					dbpool.initPool(host = mainConfig['host'], \
 							user = mainConfig['user'], \
@@ -66,7 +65,7 @@ class MysqlObject(object):
 							#charset = mainConfig['charset']) # deleted by wtx 20170109
 					__conn[x+'_query'] = dbpool.connection()
 					#wtx-end@20170123
-					'''
+
 			except Exception, e:
 				print e,'[{======Mysql connection error......======}]'
 				return {}
@@ -351,7 +350,7 @@ def showMsg(code, msg):
 	return json.dumps(rd)+'(end)'
 
 def showDict(dicts):
-	return json.dumps(dicts)+'(end)' # dumps是将dict转化成str格式，loads是将str转化成dict格式
+	return json.dumps(dicts)+'(end)' # wtx:dumps是将dict转化成str格式，loads是将str转化成dict格式
 
 def jsonload(data):
 	data = re.sub(r"(,?)(\w+?)\s+?:", r"\1'\2' :", data);

@@ -1,7 +1,7 @@
 {
 	"master":{"rootport":9999,"webport":9998},
 	"servers":{
-		"net":{"netport":10000,"name":"net","remoteport":[{"rootport":20001,"rootname":"gate"},{"rootport":20002,"rootname":"timer"}],"app":"app.netServer"},
+		"net":{"netport":843,"name":"net","remoteport":[{"rootport":20001,"rootname":"gate"},{"rootport":20002,"rootname":"timer"}],"app":"app.netServer"},
 		"gate":{"rootport":20001,"name":"gate","app":"app.gateServer"},
 		"timer":{"rootport":20002,"name":"timer","app":"app.timerServer"},
 		"cross":{"name":"cross","app":"app.cross"}

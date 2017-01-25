@@ -138,8 +138,6 @@ class LoginServer:
         self.srvsock.connect( ('52.199.191.77', port) ) # 服务器部署之后，就要是远程的网址，最好使用系统变量定义这个接口。
         
     def run(self):
-        if(wtxdebug):
-            print 'wtx LoginServer : run'
         signIn(self.srvsock) #self.srvsock是一个新连接，将这个连接作为参数传给signin。
         returnLogin = checkMessage(self.srvsock) ## wtx注意：这里调用signIn之后，self.srvsock相当于“桥梁”
         returnLogin = str(returnLogin)
@@ -160,8 +158,6 @@ class LoginServer:
             chatServer = ChatServer( 11000, returnLogin ).run() # ChatServer的port为1000。注意config.json中。端口号也是客户端需要牢记的!
 
 if __name__ == '__main__':
-    if(wtxdebug):
-        print 'wtx LoginServer( 11001 ).run()'
     loginServer = LoginServer( 11001 ).run() # 一开始由于端口被占用，因此使用了数值更大的端口（在原端口名称前面+1），端口也是客户端需要牢记的！！
-    while 1:
+    while 1: #wtx: 这个while 1用途是什么？
         pass

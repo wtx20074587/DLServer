@@ -1,0 +1,5 @@
+1.mysql -u root -p
+:之后输入密码进入mysql
+
+2.在命令行下(已连接数据库,此时的提示符为 mysql> ),输入 source F:\hello world\niuzi.sql
+：运行已经定义好的sql脚本文件，就能创建好需要的数据库

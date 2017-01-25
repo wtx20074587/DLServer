@@ -7,6 +7,10 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
+WTX_DEBUG = True
+
+
+
 memcache = MemcacheEx('server_1')
 '''heartList = memcache.get('heartList')				#心跳的字典 格式{PID:心跳应答的时间}
 if heartList==None:
@@ -1040,16 +1044,23 @@ def userLogin(userData):
 		return {'status':-2999, 'msg':'用户ID错误'}
 	if userData.has_key('user_name')==False or userData['user_name']=='':
 		return {'status':-2998, 'msg':'用户名错误'}
+
+
+	#wtx-start@20170125@002@暂时不了解加密，因此先删除此验证过程
+	if(WTX_DEBUG):
+		return {'status': 1, 'msg': '验证成功'}
+
 	if userData.has_key('user_key')==False or userData['user_key']=='':
 		return {'status':-2997, 'msg':'用户密钥错误'}
 	#读取全局配置key
 	sunnyKey = getConfig().get('other')['authenticationKey']
 	#组建密钥
-	userKey = hashlib.md5(str(userData['user_id'])+userData['user_name']+sunnyKey.upper()).hexdigest().upper()
+	userKey = hashlib.md5(str(userData['user_id'])+userData['user_name']+sunnyKey.upper()).hexdigest().upper() #wtx:没看出密钥用途？
 	if userData['user_key']!=userKey:
 		return {'status':-2996, 'msg':'用户信息错误，请重新登录'}
 	else:
 		return {'status':1, 'msg':'验证成功'}
+	#wtx-end@20170125@002@
 
 
 def regUser(userData):
@@ -1108,7 +1119,13 @@ def regUser(userData):
 			return {'status':-1993, 'msg':'用户QQ已存在'}
 	#组建密码
 	pass_rand = randomStr()
-	password = hashlib.md5(str(userData['user_pass'])+pass_rand).hexdigest().upper()
+
+	#wtx-start@20170125@不加密密码，用于测试
+	password = hashlib.md5(str(userData['user_pass']) + pass_rand).hexdigest().upper()
+	if (WTX_DEBUG):
+		password = str(userData['user_pass']).upper()
+	# wtx-end@20170125@不加密密码，用于测试
+
 	funds_key = hashlib.md5('0'+pass_rand).hexdigest().upper()
 	userList = [userData['user_name'], password, pass_rand, 0, funds_key, 1]	
 	#开启事务

@@ -5,7 +5,7 @@ import time,threading
 from socket import AF_INET,SOCK_STREAM,socket
 from thread import start_new
 import struct,sys
-HOST='localhost'
+HOST='52.199.191.77'
 PORT=10000
 BUFSIZE=1024
 ADDR=(HOST , PORT)
@@ -23,7 +23,7 @@ def sendData(sendstr,commandId):
     data = struct.pack('!sssss3I',HEAD_0,HEAD_1,HEAD_2,\
                        HEAD_3,ProtoVersion,ServerVersion,\
                        len(sendstr)+4,commandId)
-    senddata = data+sendstr
+    senddata = data+sendstr #wtx：最终的打包方式，打包头+数据
     return senddata
 
 def resolveRecvdata(data):

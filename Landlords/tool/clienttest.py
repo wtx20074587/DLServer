@@ -7,8 +7,8 @@ import time
 from socket import AF_INET,SOCK_STREAM,socket
 import thread
 import struct
-HOST='localhost'
-PORT=10000
+HOST='52.199.191.77'
+PORT=843
 BUFSIZE=1024
 ADDR=(HOST , PORT)
 client = socket(AF_INET,SOCK_STREAM)
@@ -29,15 +29,17 @@ def sendData(sendstr,commandId):
     return senddata
 
 def resolveRecvdata(data):
+
     head = struct.unpack('!sssss3I',data[:17])
     lenght = head[6]
     data = data[17:17+lenght]
     return data
 
+
 s1 = time.time()
 
 def start():
-    client.sendall(sendData("[1,[1,'ddd33', '18C1BD9C7223FAF46CCCBD2D70942951']]",1))
+    client.sendall(sendData("[1,[1,'aaaaaa', '123456']]",1))
 
 def send_4():
     time.sleep(4)
@@ -48,6 +50,9 @@ thread.start_new_thread(send_4,())
 
 while True:
     message = client.recv(1024)#接收服务器返回的消息
+    print "Message="
+    print message
     message = resolveRecvdata(message)#解析消息
     print message.decode('utf-8').encode('gbk')
+    break
 

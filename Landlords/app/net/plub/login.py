@@ -6,13 +6,19 @@ from models.userModel import userLogin,setHeart,loginCache,checkLogin
 
 import random,json
 from models.gameMainModel import shufflingLicensing
+
+WTX_DEBUG = True
 @netserviceHandle
 def login_1(_conn,data):
-	isLogin = checkLogin(_conn.transport.sessionno)
+
+	#isLogin = checkLogin(_conn.transport.sessionno) #wtx:调试专用
+	isLogin = True #wtx:为了调试，默认用户全部已经登录了，可以直接调试
+
 	if isLogin==True:
-		return showMsg(-1, '您已的登录')
+		return showMsg(-1, '您已经登录')
 	try:
 		data = jsonload(data)
+
 		if data[0]!=1:
 			return showMsg(-1, '请求非法')
 		else:

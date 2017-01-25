@@ -49,7 +49,7 @@ def _wash():
 	pukeList = _puke()
 	#循环100次随机交换两张牌实现洗牌
 	for x in range(0,100):
-		rand_one = random.randint(0, 53) #风险：底牌是大小王的概率是多少？
+		rand_one = random.randint(0, 53) #wtx:风险：底牌是大小王的概率是多少？
 		rand_two = random.randint(0, 53)
 		pukeListValue = pukeList[rand_one]
 		pukeList[rand_one] = pukeList[rand_two]
