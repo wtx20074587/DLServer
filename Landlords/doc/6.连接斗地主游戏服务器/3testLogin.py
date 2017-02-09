@@ -20,12 +20,12 @@ client = socket(AF_INET,SOCK_STREAM)
 client.connect(ADDR)
 
 TEST_USERS = [
-"[1,[3, 'cccccc', '123456']]",
-"[1,[4, 'dddddd', '123456']]",
-"[1,[5,'eeeeee','123456']]",
-"[1,[6,'ffffff','123456']]",
-"[1,[7,'aaaaaa','123456']]",
-"[1,[8,'bbbbbb','123456']]"
+"[1,[3, 'aaaaa1', '123456']]",
+"[1,[4, 'aaaaa2', '123456']]",
+"[1,[5,'aaaaa3','123456']]",
+"[1,[6,'aaaaa4','123456']]",
+"[1,[7,'aaaaa5','123456']]",
+"[1,[8,'aaaaa6','123456']]"
 ]
 
 def sendData(sendstr,commandId):

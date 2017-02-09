@@ -405,7 +405,6 @@ CREATE TABLE IF NOT EXISTS `us_user` (
 --
 
 INSERT INTO `us_user` (`user_id`, `user_name`, `user_pass`, `pass_rand`, `balance`, `funds_key`, `is_lock`) VALUES
-(1, 'dddd33', 'BB140A5AA6EE9B0AAA0C3575A8E91458', 'QE47wCKl', 0, '6B0DC0CC141D80839CDCB9B33F0E9920', 1),
 (52, 'dddd34', '7B10EAC5790BAC98EFDEAD570627EB4B', '3FrCr#3o', 0, '37E17254CE2F60925B40CFEE8C87E997', 1);
 
 -- --------------------------------------------------------

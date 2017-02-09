@@ -9,8 +9,6 @@ sys.setdefaultencoding("utf-8")
 
 WTX_DEBUG = True
 
-
-
 memcache = MemcacheEx('server_1')
 '''heartList = memcache.get('heartList')				#心跳的字典 格式{PID:心跳应答的时间}
 if heartList==None:
@@ -57,6 +55,7 @@ def QDZ(pid,fen):
 	if fen<1 or fen>3:
 		return {'s':-1,'m':'分数数错误'}
 	isInGame = mysqlObj.getOne('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where f_u=%s or s_u=%s or t_u=%s', [pid,pid,pid])
+
 	if isInGame==False or isInGame[3]>=6 or isInGame[2]!=pid or isInGame[1]==pid or str(pid) not in isInGame[4]:
 		return {'s':-1,'m':'不该您抢地主'}
 	else:
@@ -96,6 +95,7 @@ def QDZ(pid,fen):
 def beginGame(room_id):
 	mysqlObj = MysqlObject()
 	isInGame = mysqlObj.getOne('mn','select room_id,d_z,dizhu_pid,f_u,s_u,t_u,f_p,s_p,t_p from mn_room where room_id=%s and spend=2', [room_id])
+
 	if isInGame==False or isInGame[0]<1:
 		return False
 	#读取地主牌
@@ -123,6 +123,10 @@ def removeGame(room_id):
 	'''重新发牌'''	
 	mysqlObj = MysqlObject()
 	isInGame = mysqlObj.getOne('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where room_id=%s', [room_id])
+
+	if(type(isInGame)=='dict'):
+		isInGame = isInGame.values()
+
 	u = [int(isInGame[5]), int(isInGame[6]),int(isInGame[7])]
 	pukeList = shufflingLicensing()
 	#发送信息
@@ -990,6 +994,7 @@ def randomStr():
 def setHeart(pid):
 	mysqlObj = MysqlObject()
 	isPid = mysqlObj.getOne('mn', 'select count(pid) as a from mn_heart where pid=%s',[pid])
+
 	if isPid==False or isPid[0]<1:
 		#写入心跳
 		u = mysqlObj.insertOne('mn', 'insert into mn_heart (pid, heart_time) values (%s,%s)', [pid, int(time.time())])
@@ -1045,17 +1050,17 @@ def userLogin(userData):
 	if userData.has_key('user_name')==False or userData['user_name']=='':
 		return {'status':-2998, 'msg':'用户名错误'}
 
-
-	#wtx-start@20170125@002@暂时不了解加密，因此先删除此验证过程
-	if(WTX_DEBUG):
-		return {'status': 1, 'msg': '验证成功'}
-
 	if userData.has_key('user_key')==False or userData['user_key']=='':
 		return {'status':-2997, 'msg':'用户密钥错误'}
 	#读取全局配置key
 	sunnyKey = getConfig().get('other')['authenticationKey']
 	#组建密钥
-	userKey = hashlib.md5(str(userData['user_id'])+userData['user_name']+sunnyKey.upper()).hexdigest().upper() #wtx:没看出密钥用途？
+
+	#wtx-start@20170209@001@（1）暂时不了解加密，因此将该部分忽略掉。 （2）那么用户注册时的userKey也需要做相应的改动
+	#userKey = hashlib.md5(str(userData['user_id'])+userData['user_name']+sunnyKey.upper()).hexdigest().upper() #wtx:没看出密钥用途？
+	userKey = str(userData['user_id']+userData['user_name'])
+	#wtx-end@20170209@001
+
 	if userData['user_key']!=userKey:
 		return {'status':-2996, 'msg':'用户信息错误，请重新登录'}
 	else:
@@ -1065,6 +1070,9 @@ def userLogin(userData):
 
 def regUser(userData):
 	'''用户注册方法'''
+
+	print userData
+
 	mysqlObj = MysqlObject()
 	if userData.has_key('user_name')==False or userData['user_name']=='':
 		return {'status':-1999, 'msg':'请输入用户名'}
@@ -1098,35 +1106,41 @@ def regUser(userData):
 		return {'status':-1996, 'msg':'密码长度在6~16位之间'}
 	#开始进行数据检测，检测重复等
 	isUserName = mysqlObj.getOne('us', 'select count(*) from us_user where user_name=%s',[userData['user_name']])
-	if isUserName[0]!=None and isUserName[0]>0:
+
+	if isUserName!=None and isUserName[0]>0:
 		return {'status':-1995, 'msg':'用户名已存在'}
+
 	if userData['nick_name']!='':
 		isNiceName = mysqlObj.getOne('us', 'select count(*) from us_userbase where nick_name=%s',[userData['nick_name']])
-		if isNiceName[0]!=None and isNiceName[0]>0:
+
+		if isNiceName!=None and isNiceName[0]>0:
 			return {'status':-1995, 'msg':'用户昵称已存在'}
-		userList.append(userData['nick_name'])
+		userList.append(userData['nick_name']) #wtx:为什么这里添加list？
 	if userData['email']!='':
 		isEmail = mysqlObj.getOne('us', 'select count(*) from us_userbase where email=%s',[userData['email']])
-		if isEmail[0]!=None and isEmail[0]>0:
+
+		if isEmail!=None and isEmail[0]>0:
 			return {'status':-1995, 'msg':'用户邮箱已存在'}
 	if userData['phone']!='':
 		isPhone = mysqlObj.getOne('us', 'select count(*) from us_userbase where phone=%s',[userData['phone']])
-		if isPhone[0]!=None and isPhone[0]>0:
+
+		if isPhone!=None and isPhone[0]>0:
 			return {'status':-1994, 'msg':'用户手机已存在'}
 	if userData['qq']!='':
 		isQQ = mysqlObj.getOne('us', 'select count(*) from us_userbase where qq=%s',[userData['phone']])
-		if isQQ[0]!=None and isQQ[0]>0:
+
+		if isQQ!=None and isQQ[0]>0:
 			return {'status':-1993, 'msg':'用户QQ已存在'}
 	#组建密码
 	pass_rand = randomStr()
 
-	#wtx-start@20170125@不加密密码，用于测试
+	#wtx-start@20170209@002@不加密密码，用于测试
 	password = hashlib.md5(str(userData['user_pass']) + pass_rand).hexdigest().upper()
-	if (WTX_DEBUG):
-		password = str(userData['user_pass']).upper()
-	# wtx-end@20170125@不加密密码，用于测试
+	password = str(userData['user_pass']) #wtx：不加密密码，为了方便测试
+	funds_key = hashlib.md5('0' + pass_rand).hexdigest().upper()
+	funds_key = pass_rand #wtx:不加密资金key
+	#wtx-end@20170209@002@不加密密码，用于测试
 
-	funds_key = hashlib.md5('0'+pass_rand).hexdigest().upper()
 	userList = [userData['user_name'], password, pass_rand, 0, funds_key, 1]	
 	#开启事务
 	try:
@@ -1152,17 +1166,52 @@ def regUser(userData):
 
 
 if __name__ == '__main__':
+	'''
+	1.wtx:为了测试服务器，需要先添加几个临时的测试用户
+	'''
 	print memcache.get('heartList')
-	'''userData = {
-		'user_name':'dddd34',
-		'user_pass':'123456'
-	}
-	print regUser(userData)
-	userData = {
-		'user_name':'dddd34',
-		'user_id':'1',
-		'user_key':'C9855A3C3AF6149772659CBA9D33D4A3'
-	}
-	print userLogin(userData)
-	setHeart(4)
-	print heartCheck([1,2,4,5,6])'''
+	print '000000000000000 MAIN 00000000000000'
+	for i in range(0,9,1):
+		# wtx1:注册3个用户
+		userData = {
+			'user_name': 'aaaaa' + str(i),
+			'user_pass':'123456'
+		}
+		print regUser(userData)
+		# wtx2：将3个注册好的用户登录
+		userData = {
+			'user_name': 'aaaaa' + str(i),
+			'user_id': str(i),
+			'user_key':'C9855A3C3AF6149772659CBA9D33D4A3'
+		}
+		print userLogin(userData)
+		setHeart(i)
+
+	# print heartCheck()
+
+def addTest():
+	print memcache.get('heartList')
+	print '000000000000000 MAIN 00000000000000'
+	for i in range(0, 9, 1):
+		# wtx1:注册几个用户
+		userData = {
+			'user_name': 'aaaaa' + str(i),
+			'user_pass': '123456'
+		}
+		print regUser(userData)
+		# wtx2：将3个注册好的用户登录
+		userData = {
+			'user_name': 'aaaaa' + str(i),
+			'user_id': str(i),
+			'user_key': 'C9855A3C3AF6149772659CBA9D33D4A3'
+		}
+		print userLogin(userData)
+		setHeart(i)
+
+	# print heartCheck()
+
+def dict2list(aDict):
+	if(isinstance(aDict,dict)):
+		return aDict.values()
+	else:
+		return aDict

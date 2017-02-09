@@ -51,20 +51,19 @@ class MysqlObject(object):
 							charset = mainConfig['charset'], \
 							cursorclass=DictCursor)#,\ # deleted by wtx 20170109
 							#charset = mainConfig['charset']) # deleted by wtx 20170109
-					__conn.setdefault(x+'_main', dbpool.connection())
+					__conn.setdefault(x+'_main', dbpool.connection()) # wtx:dbpool是firefly提供的连接池。
 
-					#wtx-start@20170123@(1)不需要从数据库(2)下面的原代码中使用mainConfig，也就是主从数据库使用同一个数据库
+					#wtx@20170123@(1)不需要从数据库(2)下面的原代码中使用mainConfig，也就是主从数据库使用同一个数据库
 					queryConfig = self.dbConfig.get(x).get('query')				#从数据库
-					dbpool.initPool(host = mainConfig['host'], \
-							user = mainConfig['user'], \
-							passwd = mainConfig['passwd'], \
-							port = mainConfig['port'], \
-							db = mainConfig['db'], \
-							charset = mainConfig['charset'], \
+					dbpool.initPool(host = queryConfig['host'], \
+							user = queryConfig['user'], \
+							passwd = queryConfig['passwd'], \
+							port = queryConfig['port'], \
+							db = queryConfig['db'], \
+							charset = queryConfig['charset'], \
 							cursorclass=DictCursor)#,\ # deleted by wtx 20170109
 							#charset = mainConfig['charset']) # deleted by wtx 20170109
 					__conn[x+'_query'] = dbpool.connection()
-					#wtx-end@20170123
 
 			except Exception, e:
 				print e,'[{======Mysql connection error......======}]'
@@ -159,7 +158,8 @@ class MysqlObject(object):
 				self._errorCode = 1
 				self._errorMsg = '查询不存在'
 				result = False
-			return result
+
+			return dict2list(result)
 		except Exception, e:
 			self._errorCode = -1997
 			self._errorMsg = '查询出错了：',e
@@ -185,7 +185,8 @@ class MysqlObject(object):
 				result = self._cursor[dbPrefix+'_query'].fetchmany(num)
 			else:
 				result = False
-			return result
+
+			return dict2list(result)#wtx:数据库查询类型，这里不确定，但是先修改。
 		except Exception, e:
 			self._errorCode = -1997
 			self._errorMsg = '查询出错了：',e
@@ -396,3 +397,9 @@ if __name__ == '__main__':
 	#	......返回自定义错误
 	#	s.rollback('us')
 	#	s.rollback('lo')
+
+def dict2list(aDict):
+	if(isinstance(aDict,dict)):
+		return aDict.values()
+	else:
+		return aDict

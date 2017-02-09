@@ -47,7 +47,7 @@ def _wash():
 	wtx:需要重新设置洗牌算法
 	'''
 	pukeList = _puke()
-	#循环100次随机交换两张牌实现洗牌
+	#循环100次随机交换两张牌实现洗牌 —— wtx:该洗牌方法不随机！
 	for x in range(0,100):
 		rand_one = random.randint(0, 53) #wtx:风险：底牌是大小王的概率是多少？
 		rand_two = random.randint(0, 53)

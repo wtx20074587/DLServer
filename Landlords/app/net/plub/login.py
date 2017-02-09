@@ -2,27 +2,24 @@
 import sys,os
 from firefly.server.globalobject import netserviceHandle,GlobalObject
 from models.sysModel import showMsg,jsonload
-from models.userModel import userLogin,setHeart,loginCache,checkLogin
+from models.userModel import userLogin,setHeart,loginCache,checkLogin,addTest
 
 import random,json
 from models.gameMainModel import shufflingLicensing
 
-WTX_DEBUG = True
+WTXDEBUG = "WANG TIANXIAO IS DEBUGING"
+
 @netserviceHandle
 def login_1(_conn,data):
-
-	#isLogin = checkLogin(_conn.transport.sessionno) #wtx:调试专用
-	isLogin = True #wtx:为了调试，默认用户全部已经登录了，可以直接调试
-
-	if isLogin==True:
-		return showMsg(-1, '您已经登录')
+	isLogin = checkLogin(_conn.transport.sessionno)
+	print  WTXDEBUG + "  login_1"
 	try:
 		data = jsonload(data)
 
 		if data[0]!=1:
-			return showMsg(-1, '请求非法')
+			return showMsg(-1, '请求非法001')
 		else:
-			if data[1][0]<1 or data[1][1]=='' or data[1][2]=='':
+			if data[1][0]<1 or data[1][1]=='' or data[1][2]=='': #分别对应了数据库中的：id，用户名，用户的密码。
 				return showMsg(-1, '账号数据错误')
 			returnData = userLogin({'user_id':data[1][0],'user_name':data[1][1],'user_key':data[1][2]})
 			if returnData['status']!=1:
@@ -34,7 +31,7 @@ def login_1(_conn,data):
 			#print data[1][1],'is login'
 			return showMsg(returnData['status'], returnData['msg'])
 	except Exception, e:
-		return showMsg(-1, '请求非法')
+		return showMsg(-1, '请求非法002')
 print '='*5,u'登录服务器已启动','='*5
 
 
