@@ -3,6 +3,7 @@ from sysModel import MysqlObject,MemcacheEx,__version__,getConfig,showDict					#
 from firefly.server.globalobject import GlobalObject
 import random,hashlib,time,datetime
 from gameMainModel import shufflingLicensing,checkPukeType,sortPuke,pukeData
+import threading
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -992,6 +993,8 @@ def randomStr():
 	return ''.join(randList)
 
 def setHeart(pid):
+
+	print "WANGTIANXIAO DEBUGING  -- setHeart -- "
 	mysqlObj = MysqlObject()
 	isPid = mysqlObj.getOne('mn', 'select count(pid) as a from mn_heart where pid=%s',[pid])
 
@@ -1070,8 +1073,6 @@ def userLogin(userData):
 
 def regUser(userData):
 	'''用户注册方法'''
-
-	print userData
 
 	mysqlObj = MysqlObject()
 	if userData.has_key('user_name')==False or userData['user_name']=='':
@@ -1198,6 +1199,7 @@ def addTest():
 			'user_name': 'aaaaa' + str(i),
 			'user_pass': '123456'
 		}
+		print userData
 		print regUser(userData)
 		# wtx2：将3个注册好的用户登录
 		userData = {
@@ -1205,11 +1207,8 @@ def addTest():
 			'user_id': str(i),
 			'user_key': 'C9855A3C3AF6149772659CBA9D33D4A3'
 		}
-		print userLogin(userData)
-		setHeart(i)
-
-	# print heartCheck()
-
+		# print userLogin(userData) #wtx:只注册用户，不登录
+		# setHeart(i) # 只注册，不心跳用户
 def dict2list(aDict):
 	if(isinstance(aDict,dict)):
 		return aDict.values()

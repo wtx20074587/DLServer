@@ -8,8 +8,6 @@ import time
 dataprotocl = DataPackProtoc(127,12,24,22,65,1)#定义协议
 GlobalObject().netfactory.setDataProtocl(dataprotocl)
 
-
-
 '''连接断开时'''
 def doConnectionLost(conn):
 	losePid = conn.transport.sessionno
@@ -24,9 +22,10 @@ def doConnectionLost(conn):
 
 GlobalObject().netfactory.doConnectionLost = doConnectionLost
 
-def initmain():
+def initmain(): #wtx:这里import之后才能启动应用？
 	import plub.login
 	import plub.setheart
 	import plub.console
 	import plub.methodcallback
+	import plub.registerUser #wtx: 20170210add 用于添加新的接口666。测试通过。
 	initCache()	#初始化缓存
