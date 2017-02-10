@@ -1061,10 +1061,10 @@ def userLogin(userData):
 
 	#wtx-start@20170209@001@（1）暂时不了解加密，因此将该部分忽略掉。 （2）那么用户注册时的userKey也需要做相应的改动
 	#userKey = hashlib.md5(str(userData['user_id'])+userData['user_name']+sunnyKey.upper()).hexdigest().upper() #wtx:没看出密钥用途？
-	userKey = str(userData['user_id']+userData['user_name'])
+	userKey = str(userData['user_key'])
 	#wtx-end@20170209@001
 
-	if userData['user_key']!=userKey:
+	if str(userData['user_key'])!=str(userKey):
 		return {'status':-2996, 'msg':'用户信息错误，请重新登录'}
 	else:
 		return {'status':1, 'msg':'验证成功'}
@@ -1186,7 +1186,6 @@ if __name__ == '__main__':
 			'user_key':'C9855A3C3AF6149772659CBA9D33D4A3'
 		}
 		print userLogin(userData)
-		setHeart(i)
 
 	# print heartCheck()
 
@@ -1208,7 +1207,7 @@ def addTest():
 			'user_key': 'C9855A3C3AF6149772659CBA9D33D4A3'
 		}
 		# print userLogin(userData) #wtx:只注册用户，不登录
-		# setHeart(i) # 只注册，不心跳用户
+
 def dict2list(aDict):
 	if(isinstance(aDict,dict)):
 		return aDict.values()
