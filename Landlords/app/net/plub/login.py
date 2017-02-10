@@ -12,9 +12,7 @@ WTXDEBUG = "WANG TIANXIAO IS DEBUGING"
 @netserviceHandle
 def login_1(_conn,data):
 	isLogin = checkLogin(_conn.transport.sessionno)
-	print  WTXDEBUG + "  login_1"
-	#try:
-	if(True):
+	try:
 		data = jsonload(data)
 
 		if data[0]!=1:
@@ -29,9 +27,8 @@ def login_1(_conn,data):
 			if cache==False:
 				return showMsg(-1, '您已经登录，请先下线')
 			setHeart(_conn.transport.sessionno)	#更新心跳 #wtx:疑问？：心跳更新的参数是什么类型？？
-			#print data[1][1],'is login'
 			return showMsg(returnData['status'], returnData['msg'])
-	#except Exception, e:
+	except Exception, e:
 		return showMsg(-1, '请求非法002')
 print '='*5,u'登录服务器已启动','='*5
 

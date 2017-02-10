@@ -993,8 +993,6 @@ def randomStr():
 	return ''.join(randList)
 
 def setHeart(pid):
-
-	print "WANGTIANXIAO DEBUGING  -- setHeart -- "
 	mysqlObj = MysqlObject()
 	isPid = mysqlObj.getOne('mn', 'select count(pid) as a from mn_heart where pid=%s',[pid])
 
@@ -1171,7 +1169,6 @@ if __name__ == '__main__':
 	1.wtx:为了测试服务器，需要先添加几个临时的测试用户
 	'''
 	print memcache.get('heartList')
-	print '000000000000000 MAIN 00000000000000'
 	for i in range(0,9,1):
 		# wtx1:注册3个用户
 		userData = {
@@ -1191,7 +1188,6 @@ if __name__ == '__main__':
 
 def addTest():
 	print memcache.get('heartList')
-	print '000000000000000 MAIN 00000000000000'
 	for i in range(0, 9, 1):
 		# wtx1:注册几个用户
 		userData = {
@@ -1207,9 +1203,3 @@ def addTest():
 			'user_key': 'C9855A3C3AF6149772659CBA9D33D4A3'
 		}
 		# print userLogin(userData) #wtx:只注册用户，不登录
-
-def dict2list(aDict):
-	if(isinstance(aDict,dict)):
-		return aDict.values()
-	else:
-		return aDict
