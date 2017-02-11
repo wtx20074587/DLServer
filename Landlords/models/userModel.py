@@ -56,7 +56,6 @@ def QDZ(pid,fen):
 	if fen<1 or fen>3:
 		return {'s':-1,'m':'分数数错误'}
 	isInGame = mysqlObj.getOne('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where f_u=%s or s_u=%s or t_u=%s', [pid,pid,pid])
-
 	if isInGame==False or isInGame[3]>=6 or isInGame[2]!=pid or isInGame[1]==pid or str(pid) not in isInGame[4]:
 		return {'s':-1,'m':'不该您抢地主'}
 	else:
@@ -995,7 +994,6 @@ def randomStr():
 def setHeart(pid):
 	mysqlObj = MysqlObject()
 	isPid = mysqlObj.getOne('mn', 'select count(pid) as a from mn_heart where pid=%s',[pid])
-
 	if isPid==False or isPid[0]<1:
 		#写入心跳
 		u = mysqlObj.insertOne('mn', 'insert into mn_heart (pid, heart_time) values (%s,%s)', [pid, int(time.time())])

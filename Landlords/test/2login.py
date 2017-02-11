@@ -56,7 +56,7 @@ def send(data, num):
 
 def start():
     random_number = random.randint(0,len(TEST_USERS)-1) #随机取一个用户做测试
-    loginMsg =TEST_USERS[random_number] #随机取一个用户做测试
+    loginMsg =TEST_USERS[0] #随机取一个用户做测试，wtx：测试抢地主，只用第一个用户测试
     send(loginMsg, LOGIN) #LOGIN就是对应的commandId：登录专用
 
 start()

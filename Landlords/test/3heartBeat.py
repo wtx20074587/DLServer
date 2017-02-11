@@ -58,7 +58,7 @@ def send(data, num):
 def start():
     #1.随机选取一个用户，然后将该用户登录
     random_number = random.randint(0, len(TEST_USERS) - 1)
-    loginMsg = TEST_USERS[random_number]
+    loginMsg = TEST_USERS[0] #wtx：其实没区别，只用第一个用户登录，测试抢地主和不抢地主
     send(loginMsg, LOGIN)
     #2.用户登录之后，保持心跳
     timer = threading.Timer(1,sendHeartBeat)
