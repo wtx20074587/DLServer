@@ -14,6 +14,11 @@ def console_3(_conn,data):
 		return showMsg(-1, '您还未登录')
 	#try:
 	data = jsonload(data)
+
+
+	print 'WTX console_3,data=',data
+
+
 	if data[0]!=2:
 		return showMsg(-1, '请求非法')
 	else:
@@ -62,10 +67,11 @@ def console_3(_conn,data):
 			if int(data[1][1]) not in [1,2,3,4]:#5种房间类型
 				return showMsg(-1, '房间错误，请刷新浏览器')
 			isJoin = joinQueue(_sessionno,data[1][1])
+			print 'WTX isJoin=',isJoin
 			if isJoin['s']==-1:
 				return showMsg(isJoin['s'], isJoin['m'])
 			else:
-				return showDict({'s':1,'c':1001})	#flash操作号1001，flash显示加入队列成功
+				return showDict({'s':1,'m':1001})	#flash操作号1001，flash显示加入队列成功 #wtx:将c改变成m
 		elif data[1][0]==6:
 			#取用户信息
 			isGet = getUserInfo(_sessionno)

@@ -58,21 +58,21 @@ def createroom():
 			pidList = isroom['matchList']
 			#判断玩家是否在游戏中
 			for y in pidList:
-				isgame = mysqlObj.getOne('mn', 'select count(*) as a from mn_room where f_u=%s or s_u=%s or t_u=%s',[y[0],y[0],y[0]])
+				isgame = mysqlObj.getOne('mn', 'select count(*) as a from mn_room where f_u=%s or s_u=%s or t_u=%s',[y['pid'],y['pid'],y['pid']])
 				if isgame==False or isgame[0]<1:
 					continue
 				else:
-					mysqlObj.delete('mn', 'delete from mn_gamequeue where pid =%s',[y[0]])
+					mysqlObj.delete('mn', 'delete from mn_gamequeue where pid =%s',[y['pid']])
 					isInGame = 1
 			if isInGame==1:
 				continue
-			mysqlObj.delete('mn', 'delete from mn_gamequeue where pid in (%s, %s, %s)',[pidList[0][0],pidList[1][0],pidList[2][0]])
+			mysqlObj.delete('mn', 'delete from mn_gamequeue where pid in (%s, %s, %s)',[pidList[0]['pid'],pidList[1]['pid'],pidList[2]['pid']])
 			#创建牌组，并生成房间
 			pukeList = shufflingLicensing()
 			#写入数据库中
 			roomUserList = []
 			for y in pidList:
-				roomUserList.append(y[0])
+				roomUserList.append(y['pid'])
 			room_id = mysqlObj.insertOne('mn', 'insert into mn_room (f_u,s_u,t_u,f_p,s_p,t_p,d_z,timer,timer_pid, multiple,puke_type,dz_user,spend,money_type) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',\
 				[roomUserList[0],roomUserList[1],roomUserList[2],','.join(pukeList[0]),','.join(pukeList[1]),','.join(pukeList[2]),','.join(pukeList[3]), int(time.time()),0, 1,0,str(roomUserList[0])+','+str(roomUserList[1])+','+str(roomUserList[2]), 1,x])	#写入房间完毕
 			for y in range(0, len(pidList)):
@@ -96,7 +96,7 @@ def createroom():
 				#读取用户数据
 
 				#调用发牌异步方法
-				GlobalObject().root.callChild('net','sendpuke_201',[pidList[y][0]],showDict(returnData))
+				GlobalObject().root.callChild('net','sendpuke_201',[pidList[y]['pid']],showDict(returnData))
 			#初始化抢地主
 			returnData = {'s':1, 'c':2000}
 			if 's5' in ','.join(pukeList[0]):

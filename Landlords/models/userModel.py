@@ -56,6 +56,7 @@ def QDZ(pid,fen):
 	if fen<1 or fen>3:
 		return {'s':-1,'m':'分数数错误'}
 	isInGame = mysqlObj.getOne('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where f_u=%s or s_u=%s or t_u=%s', [pid,pid,pid])
+
 	if isInGame==False or isInGame[3]>=6 or isInGame[2]!=pid or isInGame[1]==pid or str(pid) not in isInGame[4]:
 		return {'s':-1,'m':'不该您抢地主'}
 	else:
@@ -959,7 +960,7 @@ def loginCache(pid,user_id,user_name):
 
 def joinQueue(pid,room_type):
 	mysqlObj = MysqlObject()
-	isjoinQueue = mysqlObj.getOne('mn', 'select count(pid) as a from mn_gamequeue where pid=%s', [pid])
+	isjoinQueue = mysqlObj.getOne('mn', 'select * from mn_gamequeue where pid=%s',[pid])
 	if isjoinQueue==False or isjoinQueue[0]<1:
 		isInGame = mysqlObj.getOne('mn','select count(id) as a from mn_room where f_u=%s or s_u=%s or t_u=%s', [pid])
 		if isInGame==False or isInGame[0]<1:
@@ -1027,10 +1028,10 @@ def checkLogin(pid):
 	return returnData
 
 def sysMsg(text):
-	return {'t':'系统消息：','c':text}
+	return {'t':'系统消息：','m':text} #wtx:c->m
 
 def userTalk(user_name, text):
-	return {'t':user_name+'：','c':text}
+	return {'t':user_name+'：','m':text} #wtx: c-> m
 
 def heartCheck():
 	mysqlObj = MysqlObject()

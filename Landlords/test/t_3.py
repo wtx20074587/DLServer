@@ -58,7 +58,7 @@ def send(data, num):
 def start():
     #1.随机选取一个用户，然后将该用户登录
     random_number = random.randint(0, len(TEST_USERS) - 1)
-    loginMsg = TEST_USERS[0] #wtx：其实没区别，只用第一个用户登录，测试抢地主和不抢地主
+    loginMsg = TEST_USERS[2] #wtx：第3个用户
     send(loginMsg, LOGIN)
     #2.用户登录之后，保持心跳
     timer = threading.Timer(1,sendHeartBeat)
@@ -81,6 +81,7 @@ while True:
     message = client.recv(1024)#接收服务器返回的消息
     message = resolveRecvdata(message)#解析消息，此时返回的message对象是string类型
     message = eval(message) #将message对象由string类型转化成dict类型
-    status = message['s'] #状态
-    return_msg = message['m'] #返回信息
-    print eval("u'%s'" %(return_msg))
+    print 'WTX, message =', message
+    # status = message['s'] #状态
+    # return_msg = message['m'] #返回信息
+    #print eval("u'%s'" %(message))

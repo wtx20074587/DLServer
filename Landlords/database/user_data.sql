@@ -51,10 +51,5 @@ CREATE TABLE IF NOT EXISTS `mn_user` (
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-INSERT INTO `mn_user` (`user_id`, `user_name`, `user_pass`) VALUES
-(3,'cccccc','123456'),
-(4,'dddddd','123456'),
-(5,'eeeeee','123456'),
-(6,'ffffff','123456'),
-(7,'aaaaaa','123456'),
-(8,'bbbbbb','123456');
+-- INSERT INTO `mn_user` (`user_id`, `user_name`, `user_pass`) VALUES
+-- (1,'cccccc','123456');

@@ -9,6 +9,6 @@ def heart_2(_conn,data):
 	'''心跳请求接口'''
 	isLogin = checkLogin(_conn.transport.sessionno)
 	if isLogin==False:
-		return showMsg(-1, '您还未登录')
+		return showMsg(-1, '您还未登录00')
 	setHeart(_conn.transport.sessionno)
 	return showMsg(1, '')
