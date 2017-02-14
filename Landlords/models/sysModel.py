@@ -149,11 +149,11 @@ class MysqlObject(object):
 			return False
 		try:
 			if param is None:
-				count = self._cursor[dbPrefix+'_query'].execute(sql)
+				count = self._cursor[dbPrefix+'_query'].execute(sql);print 'WTX CURSOR1,type=',type(count)
 			else:
-				count = self._cursor[dbPrefix+'_query'].execute(sql,param)
+				count = self._cursor[dbPrefix+'_query'].execute(sql,param);print 'WTX CURSOR1,type=',type(count)
 			if count>0:
-				result = self._cursor[dbPrefix+'_query'].fetchone()
+				result = self._cursor[dbPrefix+'_query'].fetchone();print 'WTX CURSOR1,type=',type(count)
 			else:
 				self._errorCode = 1
 				self._errorMsg = '查询不存在'
@@ -163,6 +163,33 @@ class MysqlObject(object):
 		except Exception, e:
 			self._errorCode = -1997
 			self._errorMsg = '查询出错了：',e
+			return False
+	def getOneDict(self,dbPrefix,sql,param=None):
+		"""
+                @summary: 执行查询，并取出第一条
+                @param dbPrefix:数据库前缀
+                @param sql:查询sql，如果有查询条件，请只指定条件列表，并将条件值使用参数[param]传递进来
+                @param param: 可选参数，条件列表值（元组/列表）
+                @return: result list/boolean 查询到的结果集, 出错时，MysqlObject._errorCode!=1则表示有错误，MysqlObject._errorCode==1表示空集
+                """
+		if self.checkDbPrefix(dbPrefix, sql) == False:
+			return False
+		try:
+			if param is None:
+				count = self._cursor[dbPrefix + '_query'].execute(sql)
+			else:
+				count = self._cursor[dbPrefix + '_query'].execute(sql, param)
+			if count > 0:
+				result = self._cursor[dbPrefix + '_query'].fetchone()
+			else:
+				self._errorCode = 1
+				self._errorMsg = '查询不存在'
+				result = False
+
+			return result
+		except Exception, e:
+			self._errorCode = -1997
+			self._errorMsg = '查询出错了：', e
 			return False
 
 	def getMany(self,dbPrefix,sql,num,param=None):

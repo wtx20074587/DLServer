@@ -55,22 +55,24 @@ def QDZ(pid,fen):
 	mysqlObj = MysqlObject()
 	if fen<1 or fen>3:
 		return {'s':-1,'m':'分数数错误'}
-	isInGame = mysqlObj.getOne('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where f_u=%s or s_u=%s or t_u=%s', [pid,pid,pid])
 
-	if isInGame==False or isInGame[3]>=6 or isInGame[2]!=pid or isInGame[1]==pid or str(pid) not in isInGame[4]:
+	isInGame = mysqlObj.getOneDict('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where f_u=%s or s_u=%s or t_u=%s', [pid,pid,pid])
+	# room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u
+   #if isInGame==False or isInGame[3]>=6 or isInGame[2]!=pid or isInGame[1]==pid or str(pid) not in isInGame[4]:
+	if isInGame==False or isInGame['multiple']>=6 or isInGame['timer_pid']!=pid or isInGame['dizhu_pid']==pid or str(pid) not in isInGame['dz_user']:
 		return {'s':-1,'m':'不该您抢地主'}
 	else:
-		if isInGame[3]==2:
+		if isInGame['multiple']==2:
 			if fen<2:
 				return {'s':-2,'m':'不能低于2分'}
-		if isInGame[3]==4:
+		if isInGame['multiple']==4:
 			if fen<3:
 				return {'s':-2,'m':'不能低于3分'}
 		multiple = 2*fen
 		#修改数据库
-		mysqlObj.update('mn', 'update mn_room set multiple=%s,dizhu_pid=%s,timer=%s where room_id=%s', [multiple, pid,int(time.time()),isInGame[0]])
+		mysqlObj.update('mn', 'update mn_room set multiple=%s,dizhu_pid=%s,timer=%s where room_id=%s', [multiple, pid,int(time.time()),isInGame['room_id']])
 		#如果倍数不等于6，就开始下一个用户判断否则直接发送开始游戏信息
-		u = [int(isInGame[5]),int(isInGame[6]),int(isInGame[7])]
+		u = [int(isInGame['f_u']),int(isInGame['s_u']),int(isInGame['t_u'])]
 		weizhi = u.index(pid)
 		if weizhi==0:
 			nowUser = 'f_u'
@@ -79,9 +81,9 @@ def QDZ(pid,fen):
 		if weizhi==2:
 			nowUser = 't_u'
 		if multiple!=6:
-			getNextUser(isInGame[4], isInGame[2], isInGame[0], u, nowUser, fen)
+			getNextUser(isInGame['dz_user'], isInGame['timer_pid'], isInGame['room_id'], u, nowUser, fen)
 		else:
-			beginGame(isInGame[0])
+			beginGame(isInGame['room_id'])
 			#直接开始游戏啦
 			'''returnData = {'s':1, 'c':2000}
 			if u.index(pid)==0:
@@ -158,11 +160,12 @@ def removeGame(room_id):
 def unQDZ(pid):
 	'''不抢地主'''
 	mysqlObj = MysqlObject()
-	isInGame = mysqlObj.getOne('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where f_u=%s or s_u=%s or t_u=%s and spend=2', [pid,pid,pid])
-	if isInGame==False or isInGame[2]!=pid or isInGame[1]==pid or str(pid) not in isInGame[4]:
+	isInGame = mysqlObj.getOneDict('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where f_u=%s or s_u=%s or t_u=%s and spend=2', [pid,pid,pid])
+   #if isInGame == False or isInGame[2] != pid or isInGame[1] == pid or str(pid) not in isInGame[4]:
+	if isInGame==False or isInGame['timer_pid']!=pid or isInGame['dizhu_pid']==pid or str(pid) not in isInGame['dz_user']:
 		return {'s':-1,'m':'不该您抢地主'}
 	#判断三种情况，一种是，都不抢，一种是只剩下一个人了，一种是大于1
-	dz_user = isInGame[4].split(',')
+	dz_user = isInGame['dz_user'].split(',')
 	for x in range(0,len(dz_user)):
 		dz_user[x] = int(dz_user[x])
 	dz_key = dz_user.index(pid)
@@ -172,7 +175,7 @@ def unQDZ(pid):
 		dz_user[x] = str(dz_user[x])
 	u_dz_user = ','.join(dz_user)
 	mysqlObj.update('mn', 'update mn_room set timer=%s, dz_user=%s where room_id=%s',[int(time.time()),u_dz_user,isInGame[0]])
-	u = [int(isInGame[5]), int(isInGame[6]),int(isInGame[7])]
+	u = [int(isInGame['f_u']), int(isInGame['s_u']),int(isInGame['t_u'])]
 	weizhi = u.index(pid)
 	if weizhi==0:
 		nowUser = 'f_u'
@@ -182,12 +185,13 @@ def unQDZ(pid):
 		nowUser = 't_u'
 	GlobalObject().netfactory.pushObject(3,showDict({'s':1, 'c':2004,'n_u':nowUser}),u)#不抢地主数据
 	if num==0:
-		removeGame(isInGame[0])
-	elif num==1 and isInGame[1]!=None and isInGame[1]!='':
+		removeGame(isInGame['room_id'])
+	elif num==1 and isInGame['dizhu_pid']!=None and isInGame['dizhu_pid']!='':
 		#直接开始游戏啦
-		beginGame(isInGame[0])
+		beginGame(isInGame['room_id'])
 	else:
-		getNextUser(isInGame[4], isInGame[2], isInGame[0], u,nowUser,0)
+		#getNextUser(dz_user,timer_pid, room_id, u, nowUser, fen):
+		getNextUser(isInGame['dz_user'], isInGame['timer_pid'], isInGame['room_id'], u,nowUser,0)
 	return {'s':1}
 
 
