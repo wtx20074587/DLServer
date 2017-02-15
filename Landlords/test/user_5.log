@@ -1,0 +1,5 @@
+Thu, 16 Feb 2017 00:06:16 u5.py[line:98] DEBUG message = {'s': 1, 'm': '\\u9a8c\\u8bc1\\u6210\\u529f'}
+Thu, 16 Feb 2017 00:06:17 u5.py[line:98] DEBUG message = {'s': 1, 'm': 1001}
+Thu, 16 Feb 2017 00:06:17 u5.py[line:98] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 00:06:22 u5.py[line:98] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 00:06:25 u5.py[line:98] DEBUG message = {'s_p': ['s3', 'f6', 'f3', 'fK', 'h8', 'bK', 'b6', 'b5', 's4', 'b4', 'b9', 'P2', 'h6', 'h5', 'h7', 'fA', 'sA'], 'c': 1000, 'd': 3, 's': 1, 'f_p': 17, 't_p': 17}

@@ -1,0 +1,16 @@
+Thu, 16 Feb 2017 00:06:09 u4.py[line:98] DEBUG message = {'s': 1, 'm': '\\u9a8c\\u8bc1\\u6210\\u529f'}
+Thu, 16 Feb 2017 00:06:09 u4.py[line:98] DEBUG message = {'s': 1, 'm': 1001}
+Thu, 16 Feb 2017 00:06:10 u4.py[line:98] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 00:06:15 u4.py[line:98] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 00:06:20 u4.py[line:98] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 00:06:25 u4.py[line:98] DEBUG message = {'s_p': 17, 'c': 1000, 'd': 3, 's': 1, 'f_p': ['sQ', 'b3', 'bJ', 'hK', 'f4', 'hJ', 'h9', 'bQ', 'h3', 'f9', 's8', 'b8', 's2', 'fQ', 'h4', 'sK', 'h2'], 't_p': 17}
+Thu, 16 Feb 2017 00:06:25 u4.py[line:98] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 00:06:25 u4.py[line:98] DEBUG message = {'s': -1, 'm': '\\u6e38\\u620f\\u4e0d\\u5b58\\u5728', 'c': 2014}
+Thu, 16 Feb 2017 00:06:26 u4.py[line:98] DEBUG message = {'d_z': ['s9', 's10', 'h10'], 's': 1, 'c': 2002, 'dz_u': 't_u'}
+Thu, 16 Feb 2017 00:06:30 u4.py[line:98] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 00:06:30 u4.py[line:98] DEBUG message = {'s': -1, 'm': '\\u4e0d\\u8be5\\u60a8\\u62a2\\u5730\\u4e3b', 'c': 2005}
+Thu, 16 Feb 2017 00:06:35 u4.py[line:98] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 00:06:40 u4.py[line:98] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 00:06:44 u4.py[line:98] DEBUG message = {'s': -1, 'm': '\\u4e0d\\u8be5\\u60a8\\u62a2\\u5730\\u4e3b', 'c': 2005}
+Thu, 16 Feb 2017 00:06:45 u4.py[line:98] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 00:06:50 u4.py[line:98] DEBUG message = {'s': 1, 'm': ''}

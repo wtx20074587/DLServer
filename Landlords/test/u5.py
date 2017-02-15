@@ -97,6 +97,52 @@ def startCycle():
         print message
         logging.debug(u'message = %s', message)
 
+        '''
+        下面需要进行自动化测试：
+        1.解析返回的message数据：
+        s：1——表示成功
+            -1——表示失败
+        c:2002——抢地主失败
+        2.本办法：
+        （0）直接抢地主
+        （1）解析所用的返回数据，然后查看当前的牌，如果有H5，就认为自己是地主。
+        （2）然后地主用户开始不断的出牌（单张即可）；非地主用户不出牌
+        '''
+        if message['s'] > 0:
+            autoStart(message)
+
+
+def autoStart(message):
+    try:
+        print 'puking'
+        if message['s'] > 0:
+            f_p = message['f_p']
+            s_p = message['s_p']
+            t_p = message['t_p']
+            currentpuke = []
+            amIDzUser = False
+            # 1.先把当前用户的牌取出来，看是否含有h5
+            if isinstance(f_p, list):
+                currentpuke = f_p
+            if isinstance(s_p, list):
+                currentpuke = s_p
+            if isinstance(t_p, list):
+                currentpuke = t_p
+            # 2.如果含有h5，当前用户就是地主
+            if 'h5' in currentpuke:
+                amIDzUser = True
+
+            # 3.如果是地主用户，就不断的出单张的牌
+            if amIDzUser == True:
+                if len(currentpuke) > 0:  # we have more than 1 puke
+                    puke(currentpuke[0])
+                    currentpuke.remove(currentpuke[0])
+            # 4.不是地主用户，就不断的pass
+            if amIDzUser == False:
+                unpuke()
+    except:
+        print 'wtx error'
+
 
 
 #wtx-start:20170212:上面的代码实现功能：1.启动登录 2.保持心跳
@@ -107,7 +153,7 @@ joinGameMsg = "[2,[5,1]]" # 请求游戏队列格式： "[2,[5,1]]"
 quitGameMsg = "[2,[7,1]]" # 退出游戏队列： "[2,[7,1]]"
 qdzMsg = "[2,[1,3]]" # 抢地主格式："[2,[1,"+ point +"]]"
 unqdzMsg = "[2,[2]]" # 不抢地主给： "[2,[2]]"
-pukeMsg = "[2,[3,s5]]" # 用户出牌格式： "[2,[3, "+ str +"]]"
+#pukeMsg = "[2,[3,s5]]" # 用户出牌格式： "[2,[3, "+ str +"]]"
 unpukeMsg = "[2,[4]]" # 用户不出牌格式： "[2,[4]]"
 
 
@@ -152,10 +198,13 @@ def stopHeart(): #停止心跳
 def deal(): #请求发牌
     send(dealMsg,DEAL)
 
-def puke(): # 用户出牌
+def puke(aPuke): # 用户出牌
+    pukeMsg = "[2,[3, "+ aPuke +"]]"
+    print "pukeMsg=", pukeMsg
     send(pukeMsg,HANDLE)
 
 def unpuke(): # 用户跳过出牌：不出
+    print 'unpuke'
     send(unpukeMsg,HANDLE)
 
 def quitGame():
