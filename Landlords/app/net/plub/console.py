@@ -15,11 +15,7 @@ def console_3(_conn,data):
 	#try:
 	data = jsonload(data)
 
-
-	print 'WTX console_3,data=',data
-
-
-	if data[0]!=2:
+	if data[0]!=2: #wtx:因此，客户端定义的DEAL=4，不是合法操作。可以删除。
 		return showMsg(-1, '请求非法')
 	else:
 		if data[1][0]==1:

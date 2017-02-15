@@ -2,7 +2,12 @@
 from sysModel import MysqlObject,MemcacheEx,__version__,getConfig						#引入mysql, memcache, 系统模块版本号
 #from userModel import memcache						
 import random,hashlib,time,datetime,os,json
-pukeData = {"h8": 6, "f3": 1, "f4": 2, "f5": 3, "f6": 4, "f7": 5, "f8": 6, "h3": 1, "h6": 4, "h7": 5, "h4": 2, "h5": 3, "b4": 2, "b5": 3, "b6": 4, "b7": 5, "b2": 13, "b3": 1, "b8": 6, "b9": 7, "s9": 7, "s8": 6, "fA": 12, "s3": 1, "s2": 13, "s7": 5, "s6": 4, "s5": 3, "s4": 2, "h2": 13, "f9": 7, "P2": 14, "P1": 15, "sQ": 10, "f2": 13, "sK": 11, "sJ": 9, "h9": 7, "sA": 12, "fQ": 10, "hA": 12, "bA": 12, "hQ": 10, "bJ": 9, "bK": 11, "hJ": 9, "hK": 11, "bQ": 10, "fJ": 9, "fK": 11, "f10":8, "s10":8,"b10":8,"h10":8}
+pukeData = {"h8": 6, "f3": 1, "f4": 2, "f5": 3, "f6": 4, "f7": 5, "f8": 6, "h3": 1, "h6": 4,
+			"h7": 5, "h4": 2, "h5": 3, "b4": 2, "b5": 3, "b6": 4, "b7": 5, "b2": 13, "b3": 1,
+			"b8": 6, "b9": 7, "s9": 7, "s8": 6, "fA": 12, "s3": 1, "s2": 13, "s7": 5, "s6": 4,
+			"s5": 3, "s4": 2, "h2": 13, "f9": 7, "P2": 14, "P1": 15, "sQ": 10, "f2": 13, "sK": 11,
+			"sJ": 9, "h9": 7, "sA": 12, "fQ": 10, "hA": 12, "bA": 12, "hQ": 10, "bJ": 9, "bK": 11,
+			"hJ": 9, "hK": 11, "bQ": 10, "fJ": 9, "fK": 11, "f10":8, "s10":8,"b10":8,"h10":8}
 
 '''TimerCache = memcache.get('timeCache')
 if TimerCache==None:

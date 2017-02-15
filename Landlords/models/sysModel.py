@@ -149,11 +149,11 @@ class MysqlObject(object):
 			return False
 		try:
 			if param is None:
-				count = self._cursor[dbPrefix+'_query'].execute(sql);print 'WTX CURSOR1,type=',type(count)
+				count = self._cursor[dbPrefix+'_query'].execute(sql)
 			else:
-				count = self._cursor[dbPrefix+'_query'].execute(sql,param);print 'WTX CURSOR1,type=',type(count)
+				count = self._cursor[dbPrefix+'_query'].execute(sql,param)
 			if count>0:
-				result = self._cursor[dbPrefix+'_query'].fetchone();print 'WTX CURSOR1,type=',type(count)
+				result = self._cursor[dbPrefix+'_query'].fetchone()
 			else:
 				self._errorCode = 1
 				self._errorMsg = '查询不存在'

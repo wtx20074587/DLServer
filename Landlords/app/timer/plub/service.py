@@ -179,9 +179,6 @@ def seizeTimer():
 				else:
 					getNextUser(x[1], int(roomInfo[3]), x[0],[int(roomInfo[0]),int(roomInfo[1]),int(roomInfo[2])])
 					continue
-		
-
-
 
 def gameTimer():
 	'''游戏倒计时'''

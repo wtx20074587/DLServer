@@ -57,8 +57,7 @@ def QDZ(pid,fen):
 		return {'s':-1,'m':'分数数错误'}
 
 	isInGame = mysqlObj.getOneDict('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where f_u=%s or s_u=%s or t_u=%s', [pid,pid,pid])
-	# room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u
-   #if isInGame==False or isInGame[3]>=6 or isInGame[2]!=pid or isInGame[1]==pid or str(pid) not in isInGame[4]:
+
 	if isInGame==False or isInGame['multiple']>=6 or isInGame['timer_pid']!=pid or isInGame['dizhu_pid']==pid or str(pid) not in isInGame['dz_user']:
 		return {'s':-1,'m':'不该您抢地主'}
 	else:
@@ -97,57 +96,57 @@ def QDZ(pid,fen):
 
 def beginGame(room_id):
 	mysqlObj = MysqlObject()
-	isInGame = mysqlObj.getOne('mn','select room_id,d_z,dizhu_pid,f_u,s_u,t_u,f_p,s_p,t_p from mn_room where room_id=%s and spend=2', [room_id])
+	isInGame = mysqlObj.getOneDict('mn','select room_id,d_z,dizhu_pid,f_u,s_u,t_u,f_p,s_p,t_p from mn_room where room_id=%s and spend=2', [room_id])
 
-	if isInGame==False or isInGame[0]<1:
+	if isInGame==False or isInGame['room_id']<1:
 		return False
 	#读取地主牌
-	d_z = isInGame[1].split(',')
-	u = [int(isInGame[3]),int(isInGame[4]),int(isInGame[5])]
-	if u.index(isInGame[2])==0:
-		f_p = isInGame[6]+','+isInGame[1]
-		returnData = {'s':1, 'c':2002, 'd_z':isInGame[1].split(','),'dz_u':'f_u'}
-		GlobalObject().netfactory.pushObject(3,showDict({'s':1,'c':2003,'p':f_p.split(',')}),[isInGame[2]])
-		mysqlObj.update('mn', 'update mn_room set f_p=%s,timer=%s,timer_pid=%s,dz_pid=%s,spend=3 where room_id=%s', [f_p, int(time.time()),isInGame[2],isInGame[2],room_id])
-	elif u.index(isInGame[2])==1:
-		s_p = isInGame[7]+','+isInGame[1]
-		returnData = {'s':1, 'c':2002, 'd_z':isInGame[1].split(','),'dz_u':'s_u'}
-		GlobalObject().netfactory.pushObject(3,showDict({'s':1,'c':2003,'p':s_p.split(',')}),[isInGame[2]])
-		mysqlObj.update('mn', 'update mn_room set s_p=%s,timer=%s,timer_pid=%s,dz_pid=%s,spend=3 where room_id=%s', [s_p, int(time.time()),isInGame[2],isInGame[2],room_id])
-	elif u.index(isInGame[2])==2:
-		t_p = isInGame[8]+','+isInGame[1]
-		returnData = {'s':1, 'c':2002, 'd_z':isInGame[1].split(','),'dz_u':'t_u'}
-		GlobalObject().netfactory.pushObject(3,showDict({'s':1,'c':2003,'p':t_p.split(',')}),[isInGame[2]])
-		mysqlObj.update('mn', 'update mn_room set t_p=%s,timer=%s,timer_pid=%s,dz_pid=%s,spend=3 where room_id=%s', [t_p, int(time.time()),isInGame[2],isInGame[2],room_id])
+	d_z = isInGame['d_z'].split(',')
+	u = [int(isInGame['f_u']),int(isInGame['s_u']),int(isInGame['t_u'])]
+	if u.index(isInGame['dizhu_pid'])==0:
+		f_p = isInGame['f_p']+','+isInGame['d_z']
+		returnData = {'s':1, 'c':2002, 'd_z':isInGame['d_z'].split(','),'dz_u':'f_u'}
+		GlobalObject().netfactory.pushObject(3,showDict({'s':1,'c':2003,'p':f_p.split(',')}),[isInGame['dizhu_pid']])
+		mysqlObj.update('mn', 'update mn_room set f_p=%s,timer=%s,timer_pid=%s,dz_pid=%s,spend=3 where room_id=%s', [f_p, int(time.time()),isInGame['dizhu_pid'],isInGame['dizhu_pid'],room_id])
+	elif u.index(isInGame['dizhu_pid'])==1:
+		s_p = isInGame['s_p']+','+isInGame['d_z']
+		returnData = {'s':1, 'c':2002, 'd_z':isInGame['d_z'].split(','),'dz_u':'s_u'}
+		GlobalObject().netfactory.pushObject(3,showDict({'s':1,'c':2003,'p':s_p.split(',')}),[isInGame['dizhu_pid']])
+		mysqlObj.update('mn', 'update mn_room set s_p=%s,timer=%s,timer_pid=%s,dz_pid=%s,spend=3 where room_id=%s', [s_p, int(time.time()),isInGame['dizhu_pid'],isInGame['dizhu_pid'],room_id])
+	elif u.index(isInGame['dizhu_pid'])==2:
+		t_p = isInGame['t_p']+','+isInGame['d_z']
+		returnData = {'s':1, 'c':2002, 'd_z':isInGame['d_z'].split(','),'dz_u':'t_u'}
+		GlobalObject().netfactory.pushObject(3,showDict({'s':1,'c':2003,'p':t_p.split(',')}),[isInGame['dizhu_pid']])
+		mysqlObj.update('mn', 'update mn_room set t_p=%s,timer=%s,timer_pid=%s,dz_pid=%s,spend=3 where room_id=%s', [t_p, int(time.time()),isInGame['dizhu_pid'],isInGame['dizhu_pid'],room_id])
 	#分别向客户端发送地主牌数据以及新的牌长度,先单独发更新牌的数据
 	GlobalObject().netfactory.pushObject(3,showDict(returnData),u)
 
 def removeGame(room_id):
 	'''重新发牌'''	
 	mysqlObj = MysqlObject()
-	isInGame = mysqlObj.getOne('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where room_id=%s', [room_id])
+	isInGame = mysqlObj.getOneDict('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where room_id=%s', [room_id])
 
-	if(type(isInGame)=='dict'):
-		isInGame = isInGame.values()
+	#if(type(isInGame)=='dict'): #deleted by wtx 20170215
+		#isInGame = isInGame.values() #deleted by wtx 20170215
 
-	u = [int(isInGame[5]), int(isInGame[6]),int(isInGame[7])]
+	u = [int(isInGame['f_u']), int(isInGame['s_u']),int(isInGame['t_u'])]
 	pukeList = shufflingLicensing()
 	#发送信息
 	#得到timer_pid
 	returnData = {'s':1, 'c':2000}
 	if 's5' in pukeList[0]:
-		timer_pid = isInGame[5]
+		timer_pid = isInGame['f_u']
 		returnData['p'] = 'f_u'
 	elif 's5' in pukeList[1]:
-		timer_pid = isInGame[6]
+		timer_pid = isInGame['s_u']
 		returnData['p'] = 's_u'
 	elif 's5' in pukeList[2]:
-		timer_pid = isInGame[7]
+		timer_pid = isInGame['t_u']
 		returnData['p'] = 't_u'
 	else:
-		timer_pid = isInGame[5]
+		timer_pid = isInGame['f_u']
 		returnData['p'] = 't_u'
-	dz_user = str(isInGame[5])+','+str(isInGame[6])+','+str(isInGame[7])
+	dz_user = str(isInGame['f_u'])+','+str(isInGame['s_u'])+','+str(isInGame['t_u'])
 	mysqlObj.update('mn', 'update mn_room set f_p=%s,s_p=%s,t_p=%s,d_z=%s,timer=%s,timer_pid=%s, dz_user=%s where room_id=%s',[','.join(pukeList[0]), ','.join(pukeList[1]),','.join(pukeList[2]),','.join(pukeList[3]), int(time.time()),timer_pid,dz_user,room_id])
 	removePuke_1 = {'s':1, 'c':2001, 'f_p':pukeList[0],'s_p':17,'t_p':17,'d_z':3}#重新发牌
 	removePuke_2 = {'s':1, 'c':2001, 'f_p':17,'s_p':pukeList[1],'t_p':17,'d_z':3}#重新发牌
@@ -161,7 +160,6 @@ def unQDZ(pid):
 	'''不抢地主'''
 	mysqlObj = MysqlObject()
 	isInGame = mysqlObj.getOneDict('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where f_u=%s or s_u=%s or t_u=%s and spend=2', [pid,pid,pid])
-   #if isInGame == False or isInGame[2] != pid or isInGame[1] == pid or str(pid) not in isInGame[4]:
 	if isInGame==False or isInGame['timer_pid']!=pid or isInGame['dizhu_pid']==pid or str(pid) not in isInGame['dz_user']:
 		return {'s':-1,'m':'不该您抢地主'}
 	#判断三种情况，一种是，都不抢，一种是只剩下一个人了，一种是大于1
@@ -174,7 +172,7 @@ def unQDZ(pid):
 	for x in range(0,len(dz_user)):
 		dz_user[x] = str(dz_user[x])
 	u_dz_user = ','.join(dz_user)
-	mysqlObj.update('mn', 'update mn_room set timer=%s, dz_user=%s where room_id=%s',[int(time.time()),u_dz_user,isInGame[0]])
+	mysqlObj.update('mn', 'update mn_room set timer=%s, dz_user=%s where room_id=%s',[int(time.time()),u_dz_user,isInGame['room_id']])
 	u = [int(isInGame['f_u']), int(isInGame['s_u']),int(isInGame['t_u'])]
 	weizhi = u.index(pid)
 	if weizhi==0:
@@ -609,6 +607,12 @@ def outPuke(pid, puke,userPrefix):
 
 
 def showPuke(pid, puke,pukeData):
+	'''
+	:param pid: 当前用户pid
+	:param puke: 当前用户 所出的牌
+	:param pukeData: 当前的牌堆数据，已经出过的牌会从牌堆清除
+	:return:
+	'''
 	puke = puke.split(',')
 	if len(puke)>0:
 		puke = list(set(puke))
@@ -1032,10 +1036,10 @@ def checkLogin(pid):
 	return returnData
 
 def sysMsg(text):
-	return {'t':'系统消息：','m':text} #wtx:c->m
+	return {'t':'系统消息：','c':text}
 
 def userTalk(user_name, text):
-	return {'t':user_name+'：','m':text} #wtx: c-> m
+	return {'t':user_name+'：','c':text}
 
 def heartCheck():
 	mysqlObj = MysqlObject()

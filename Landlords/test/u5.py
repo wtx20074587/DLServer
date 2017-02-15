@@ -11,14 +11,14 @@ import struct,sys
 logging.basicConfig(level=logging.DEBUG,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                 datefmt='%a, %d %b %Y %H:%M:%S',
-                filename='user_1.log',
+                filename='user_5.log',
                 filemode='w')
 # 基本参数
 HOST='52.199.191.77'
 PORT=843
 BUFSIZE=1024
 ADDR=(HOST , PORT)
-CURRENTUSER = 0
+CURRENTUSER = 4
 # 指令类型
 LOGIN = 1 #登录
 TIMER = 2 #心跳
@@ -86,7 +86,7 @@ def sendHeartBeat():
     timer = threading.Timer(5,sendHeartBeat)
     timer.start()
 
-
+#start()
 
 def startCycle():
     print 'thread name=',threading.current_thread().name
@@ -161,10 +161,6 @@ def unpuke(): # 用户跳过出牌：不出
 def quitGame():
     send(quitGameMsg,HANDLE)
 
-start()
-
-'''
 #开启新线程，用于发送不同的命令：登录，抢地主，出牌，不出牌等等
 pukeThread = threading.Thread(target=userCommand)
 pukeThread.start()
-'''
