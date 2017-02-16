@@ -36,7 +36,7 @@ def console_3(_conn,data):
 			else:
 				return showDict({'s':-1, 'm':isOK['m'],'c':2007})
 		elif data[1][0]==3:
-			isOK = showPuke(_sessionno, data[1][1],pukeData)
+			isOK = showPuke(_sessionno, data[1][1],pukeData) #wtx:出牌
 			if isOK['s']==1:
 				return showMsg(1, '')
 			else:
@@ -67,7 +67,7 @@ def console_3(_conn,data):
 			if isJoin['s']==-1:
 				return showMsg(isJoin['s'], isJoin['m'])
 			else:
-				return showDict({'s':1,'m':1001})	#flash操作号1001，flash显示加入队列成功 #wtx:将c改变成m
+				return showDict({'s':1,'c':1001})
 		elif data[1][0]==6:
 			#取用户信息
 			isGet = getUserInfo(_sessionno)

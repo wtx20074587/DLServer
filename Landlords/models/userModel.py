@@ -28,6 +28,7 @@ def initCache():
 
 def getNextUser(dz_user,timer_pid, room_id, u, nowUser, fen):
 	'''处理下一个响应PID的用户'''
+
 	mysqlObj = MysqlObject()
 	#首先获取timer_pid的用户，并计算出dz_user数量然后进行轮回
 	dz_user = dz_user.split(',')
@@ -48,6 +49,7 @@ def getNextUser(dz_user,timer_pid, room_id, u, nowUser, fen):
 		if weizhi==2:
 			returnData['p'] = 't_u'
 		mysqlObj.update('mn', 'update mn_room set timer=%s,timer_pid=%s where room_id=%s', [int(time.time()),nextUser,room_id])
+		print 'GET NEXT USER,returnData=',returnData
 		GlobalObject().netfactory.pushObject(3,showDict(returnData),u)
 
 def QDZ(pid,fen):
@@ -95,6 +97,9 @@ def QDZ(pid,fen):
 		return {'s':1}
 
 def beginGame(room_id):
+
+	print 'WTX BEGIN GAME =',room_id
+
 	mysqlObj = MysqlObject()
 	isInGame = mysqlObj.getOneDict('mn','select room_id,d_z,dizhu_pid,f_u,s_u,t_u,f_p,s_p,t_p from mn_room where room_id=%s and spend=2', [room_id])
 
@@ -119,6 +124,7 @@ def beginGame(room_id):
 		GlobalObject().netfactory.pushObject(3,showDict({'s':1,'c':2003,'p':t_p.split(',')}),[isInGame['dizhu_pid']])
 		mysqlObj.update('mn', 'update mn_room set t_p=%s,timer=%s,timer_pid=%s,dz_pid=%s,spend=3 where room_id=%s', [t_p, int(time.time()),isInGame['dizhu_pid'],isInGame['dizhu_pid'],room_id])
 	#分别向客户端发送地主牌数据以及新的牌长度,先单独发更新牌的数据
+	print 'WTX BEGIN GAME returnData =',returnData
 	GlobalObject().netfactory.pushObject(3,showDict(returnData),u)
 
 def removeGame(room_id):

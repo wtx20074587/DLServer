@@ -1,5 +1,8 @@
-Thu, 16 Feb 2017 00:06:16 u5.py[line:98] DEBUG message = {'s': 1, 'm': '\\u9a8c\\u8bc1\\u6210\\u529f'}
-Thu, 16 Feb 2017 00:06:17 u5.py[line:98] DEBUG message = {'s': 1, 'm': 1001}
-Thu, 16 Feb 2017 00:06:17 u5.py[line:98] DEBUG message = {'s': 1, 'm': ''}
-Thu, 16 Feb 2017 00:06:22 u5.py[line:98] DEBUG message = {'s': 1, 'm': ''}
-Thu, 16 Feb 2017 00:06:25 u5.py[line:98] DEBUG message = {'s_p': ['s3', 'f6', 'f3', 'fK', 'h8', 'bK', 'b6', 'b5', 's4', 'b4', 'b9', 'P2', 'h6', 'h5', 'h7', 'fA', 'sA'], 'c': 1000, 'd': 3, 's': 1, 'f_p': 17, 't_p': 17}
+Thu, 16 Feb 2017 18:23:55 u6.py[line:143] DEBUG message = {'s': 1, 'm': '\\u9a8c\\u8bc1\\u6210\\u529f'}
+Thu, 16 Feb 2017 18:23:55 u6.py[line:143] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 18:23:56 u6.py[line:143] DEBUG message = {'s_p': ['s2', 'b6', 'fK', 'f2', 'sQ', 'sK', 'f6', 'b5', 'h4', 's10', 'b8', 'b7', 'f3', 'h10', 'h5', 'h8', 'fA'], 'c': 1000, 'd': 3, 's': 1, 'f_p': 17, 't_p': 17}
+Thu, 16 Feb 2017 18:23:56 u6.py[line:143] DEBUG message = {'s': -1, 'm': '\\u4e0d\\u8be5\\u60a8\\u62a2\\u5730\\u4e3b', 'c': 2005}
+Thu, 16 Feb 2017 18:24:05 u6.py[line:143] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 18:24:15 u6.py[line:143] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 18:24:25 u6.py[line:143] DEBUG message = {'s': 1, 'm': ''}
+Thu, 16 Feb 2017 18:24:35 u6.py[line:143] DEBUG message = {'s': 1, 'm': ''}
