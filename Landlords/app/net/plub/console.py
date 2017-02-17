@@ -13,7 +13,11 @@ def console_3(_conn,data):
 	if isLogin==False:
 		return showMsg(-1, '您还未登录')
 	#try:
-	data = jsonload(data)
+
+
+	print 'before, type=',type(data)
+	data = jsonload(data) #部分数据可能会导致json转换不通过
+	print 'after, type=',type(data),'data=',data
 
 	if data[0]!=2: #wtx:因此，客户端定义的DEAL=4，不是合法操作。可以删除。
 		return showMsg(-1, '请求非法')

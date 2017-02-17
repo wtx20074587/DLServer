@@ -28,7 +28,7 @@ def initCache():
 
 def getNextUser(dz_user,timer_pid, room_id, u, nowUser, fen):
 	'''处理下一个响应PID的用户'''
-
+	print 'getNextUser'
 	mysqlObj = MysqlObject()
 	#首先获取timer_pid的用户，并计算出dz_user数量然后进行轮回
 	dz_user = dz_user.split(',')
@@ -59,7 +59,7 @@ def QDZ(pid,fen):
 		return {'s':-1,'m':'分数数错误'}
 
 	isInGame = mysqlObj.getOneDict('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where f_u=%s or s_u=%s or t_u=%s', [pid,pid,pid])
-
+	print "isInGame['multiple']=",isInGame['multiple']
 	if isInGame==False or isInGame['multiple']>=6 or isInGame['timer_pid']!=pid or isInGame['dizhu_pid']==pid or str(pid) not in isInGame['dz_user']:
 		return {'s':-1,'m':'不该您抢地主'}
 	else:
@@ -69,7 +69,7 @@ def QDZ(pid,fen):
 		if isInGame['multiple']==4:
 			if fen<3:
 				return {'s':-2,'m':'不能低于3分'}
-		multiple = 2*fen
+		multiple = 2*fen;print 'MULTIPLE=',multiple,'fen=',fen
 		#修改数据库
 		mysqlObj.update('mn', 'update mn_room set multiple=%s,dizhu_pid=%s,timer=%s where room_id=%s', [multiple, pid,int(time.time()),isInGame['room_id']])
 		#如果倍数不等于6，就开始下一个用户判断否则直接发送开始游戏信息
@@ -81,6 +81,8 @@ def QDZ(pid,fen):
 			nowUser = 's_u'
 		if weizhi==2:
 			nowUser = 't_u'
+
+		print 'mutiple=',multiple
 		if multiple!=6:
 			getNextUser(isInGame['dz_user'], isInGame['timer_pid'], isInGame['room_id'], u, nowUser, fen)
 		else:
@@ -109,9 +111,9 @@ def beginGame(room_id):
 	d_z = isInGame['d_z'].split(',')
 	u = [int(isInGame['f_u']),int(isInGame['s_u']),int(isInGame['t_u'])]
 	if u.index(isInGame['dizhu_pid'])==0:
-		f_p = isInGame['f_p']+','+isInGame['d_z']
-		returnData = {'s':1, 'c':2002, 'd_z':isInGame['d_z'].split(','),'dz_u':'f_u'}
-		GlobalObject().netfactory.pushObject(3,showDict({'s':1,'c':2003,'p':f_p.split(',')}),[isInGame['dizhu_pid']])
+		f_p = isInGame['f_p']+','+isInGame['d_z'] #如果f_u是地主，那么更新f_p的牌，即：f_p
+		returnData = {'s':1, 'c':2002, 'd_z':isInGame['d_z'].split(','),'dz_u':'f_u'} #isInGame['d_z']是地主牌
+		GlobalObject().netfactory.pushObject(3,showDict({'s':1,'c':2003,'p':f_p.split(',')}),[isInGame['dizhu_pid']]) #!!wtx风险：这里会泄露地主的牌型么？？
 		mysqlObj.update('mn', 'update mn_room set f_p=%s,timer=%s,timer_pid=%s,dz_pid=%s,spend=3 where room_id=%s', [f_p, int(time.time()),isInGame['dizhu_pid'],isInGame['dizhu_pid'],room_id])
 	elif u.index(isInGame['dizhu_pid'])==1:
 		s_p = isInGame['s_p']+','+isInGame['d_z']
@@ -216,10 +218,11 @@ def game_settle(room_id, u, leavepid=0):
 	loserPidList,winnerPidList = [],[]
 	mysqlObj = MysqlObject()
 	data = mysqlObj.getOne('mn', 'select f_p,s_p,t_p,dz_pid,money_type,multiple,f_u,s_u,t_u from mn_room where room_id=%s', [room_id])
+
 	if data==False:
 		return {'s':-3,'m':'该游戏已结束'}
 	#得到底价
-	dj = int(data[4])
+	dj = int(data['money_type'])
 	if dj==1:
 		d_money = 1
 	elif dj==2:
@@ -229,16 +232,16 @@ def game_settle(room_id, u, leavepid=0):
 	else:
 		d_money = 10
 
-	loseMoney = int(data[5]) * d_money#输的money
+	loseMoney = int(data['multiple']) * d_money#输的money
 	ct = 0
-	hasPuke_1 = len(data[0].split(','))
-	hasPuke_2 = len(data[1].split(','))
-	hasPuke_3 = len(data[2].split(','))
-	if hasPuke_1==17 and data[6]!=data[3]:
+	hasPuke_1 = len(data['f_p'].split(',')) #wtx:剩余牌的数量
+	hasPuke_2 = len(data['s_p'].split(','))
+	hasPuke_3 = len(data['t_p'].split(','))
+	if hasPuke_1==17 and data['f_u']!=data['dz_pid']:
 		ct +=1
-	if hasPuke_2==17 and data[7]!=data[3]:
+	if hasPuke_2==17 and data['s_u']!=data['dz_pid']:
 		ct +=1
-	if hasPuke_3==17 and data[8]!=data[3]:
+	if hasPuke_3==17 and data['t_u']!=data['dz_pid']:
 		ct +=1
 	if ct>=2:
 		loseMoney = loseMoney*2
@@ -247,18 +250,19 @@ def game_settle(room_id, u, leavepid=0):
 	#判断是否leavepid为空
 	if leavepid==0:
 		#正常结束，先判断是那个牌出完了
-		if data[0]=='':
+		if data['f_p']=='':
 			userindex = 0
-		elif data[1]=='':
+		elif data['s_p']=='':
 			userindex = 1
-		elif data[2]=='':
+		elif data['t_p']=='':
 			userindex = 2
 		else:
 			return {'s':-3,'m':'该游戏未结束'}
 		#获取胜利者PID
 		winnerPid = u[userindex]
+
 		#判断是不是地主
-		if winnerPid==int(data[3]):
+		if winnerPid==int(data['dz_pid']):
 			#地主获胜了,农民输
 			#先赔钱，再删除数据库，发送结束游戏指令
 			winnerPidList = [u[userindex]]
@@ -270,8 +274,8 @@ def game_settle(room_id, u, leavepid=0):
 		else:
 			#农民获胜了，地主输
 			winnerPidList = u[:]
-			winnerPidList.remove(int(data[3]))
-			loserPidList = [int(data[3])]
+			winnerPidList.remove(int(data['dz_pid']))
+			loserPidList = [int(data['dz_pid'])]
 			winMoney = loseMoney
 			losMoney = loseMoney*2
 		for x in winnerPidList:
@@ -305,15 +309,15 @@ def game_settle(room_id, u, leavepid=0):
 		loser = ','.join(str(i) for i in loser)
 		winnerID = ','.join(str(i) for i in winnerPidList)
 		loserID = ','.join(str(i) for i in loserPidList)
-		multiple = int(data[5])
+		multiple = int(data['multiple'])
 		upset = d_money
 		mysqlObj.insertOne('lo', 'insert into lo_gamelog (gamer_list,winner,loser,multiple,upset,add_time,add_ymd) values (%s,%s,%s,%s,%s,%s,%s)',[gamer_list,winner,loser,multiple,upset,int(time.time()),ymd])
 	else:
 		#判断是不是地主
-		if data[3]==None:
+		if data['dz_pid']==None:
 			dz_pid = leavepid
 		else:
-			dz_pid = int(data[3])
+			dz_pid = int(data['dz_pid'])
 		print u'退出的地主PID：',dz_pid
 		if leavepid==dz_pid:
 			print u'dizhu '
@@ -356,7 +360,7 @@ def game_settle(room_id, u, leavepid=0):
 			loser = ','.join(str(i) for i in loser)
 			winnerID = ','.join(str(i) for i in winnerPidList)
 			loserID = ','.join(str(i) for i in loserPidList)
-			multiple = int(data[5])
+			multiple = int(data['multiple'])
 			upset = d_money
 			mysqlObj.insertOne('lo', 'insert into lo_gamelog (gamer_list,winner,loser,multiple,upset,add_time,add_ymd) values (%s,%s,%s,%s,%s,%s,%s)',[gamer_list,winner,loser,multiple,upset,int(time.time()),ymd])
 		else:
@@ -417,7 +421,7 @@ def game_settle(room_id, u, leavepid=0):
 			loser = ','.join(str(i) for i in loser)
 			winnerID = ','.join(str(i) for i in winnerPidList)+','+str(winnerDZPidList[0])
 			loserID = ','.join(str(i) for i in loserPidList)
-			multiple = int(data[5])
+			multiple = int(data['multiple'])
 			upset = d_money
 			mysqlObj.insertOne('lo', 'insert into lo_gamelog (gamer_list,winner,loser,multiple,upset,add_time,add_ymd) values (%s,%s,%s,%s,%s,%s,%s)',[gamer_list,winner,loser,multiple,upset,int(time.time()),ymd])
 	winnerID = winnerID.split(',')
@@ -463,10 +467,11 @@ def game_settle(room_id, u, leavepid=0):
 def outPuke(pid, puke,userPrefix):
 	'''出牌方法'''
 	mysqlObj = MysqlObject()
-	data = mysqlObj.getOne('mn', 'select '+userPrefix+'p,f_u,s_u,t_u,room_id,now_pid from mn_room where spend=3 and timer_pid=%s', [pid])
-	if data[0]=='':
+	data = mysqlObj.getOneDict('mn', 'select '+userPrefix+'p,f_u,s_u,t_u,room_id,now_pid from mn_room where spend=3 and timer_pid=%s', [pid])
+
+	if data[userPrefix+'p']=='':
 		return {'s':-3,'m':'该游戏已结束'}
-	db_puke = data[0].split(',')
+	db_puke = data[userPrefix+'p'].split(',')
 	if len(db_puke)<len(puke):
 		return {'s':-4,'m':'数据出现错误，用户被强制退出登录，并扣除金钱处罚'}
 	#print len(db_puke)
@@ -482,7 +487,7 @@ def outPuke(pid, puke,userPrefix):
 		if x != '':
 			upd_puke.append(x) 
 	up_puke = ','.join(upd_puke)#修改牌组信息，数据库移除牌组数据
-	u = [int(data[1]), int(data[2]), int(data[3])]
+	u = [int(data['f_u']), int(data['s_u']), int(data['t_u'])]
 	#数据移到下一个用户,更新timer和timer_pid
 	try:
 		nowU = u.index(int(pid))
@@ -503,10 +508,10 @@ def outPuke(pid, puke,userPrefix):
 
 	max_puke = unicode(','.join(puke))
 	#数据移到下一个用户,更新timer和timer_pid,和数据牌组数据
-	mysqlObj.update('mn', 'update mn_room set timer=%s,timer_pid=%s,'+userPrefix+'p=%s,puke_type=%s,max_puke=%s,now_pid=%s where room_id=%s', [int(time.time()), nextPid,up_puke,checkPukeType(puke),max_puke,pid,data[4]])
+	mysqlObj.update('mn', 'update mn_room set timer=%s,timer_pid=%s,'+userPrefix+'p=%s,puke_type=%s,max_puke=%s,now_pid=%s where room_id=%s', [int(time.time()), nextPid,up_puke,checkPukeType(puke),max_puke,pid,data['room_id']])
 	pukeType = checkPukeType(puke)
 	if pukeType==3 or pukeType==6:
-		mysqlObj.update('mn', 'update mn_room set multiple=multiple*2 where room_id=%s', [data[4]])
+		mysqlObj.update('mn', 'update mn_room set multiple=multiple*2 where room_id=%s', [data['room_id']])
 	
 	#判断是否报警或为空
 	if len(upd_puke)<=2 and len(upd_puke)!=0:
@@ -515,7 +520,7 @@ def outPuke(pid, puke,userPrefix):
 		#GlobalObject().netfactory.pushObject(3,showDict(bjDict),u)
 	elif len(upd_puke)==0:
 		#游戏结束
-		return game_settle(data[4],u)
+		return game_settle(data['room_id'],u)
 	dataC = countValue(puke)
 	print dataC
 	if pukeType==1:
@@ -580,7 +585,8 @@ def outPuke(pid, puke,userPrefix):
 		music = 'wangzha.mp3'
 	if pukeType==6:
 		music = 'zhadan.mp3'
-	if data[5]==None or data[5]=='' or data[5]==False:
+
+	if data['now_pid']==None or data['now_pid']=='' or data['now_pid']==False:
 		if pukeType==4:
 			music = 'give.mp3'
 		elif pukeType==5:
@@ -619,6 +625,8 @@ def showPuke(pid, puke,pukeData):
 	:param pukeData: 当前的牌堆数据，已经出过的牌会从牌堆清除
 	:return:
 	'''
+	print 'puke=',puke,'type1=',type(puke)
+
 	puke = puke.split(',')
 	if len(puke)>0:
 		puke = list(set(puke))
@@ -631,50 +639,54 @@ def showPuke(pid, puke,pukeData):
 	#判断是否在他自己的牌中，并且是否该他出牌，并且是否大于最大牌数，并且最大的牌的用户是否是他本身
 	#首先梳理逻辑，判断是否在他的牌中
 	mysqlObj = MysqlObject()
-	data = mysqlObj.getOne('mn', 'select * from mn_room where spend=3 and timer_pid=%s', [pid])
+	data = mysqlObj.getOneDict('mn', 'select * from mn_room where spend=3 and timer_pid=%s', [pid])
+	print 'data=',data
 
-	if data==False or data==None or data[0]=='':
+	if data==False or data==None or data['room_id']=='':
 		return {'s':-1,'m':u'游戏不存在'}
 
-	if int(data[1])==pid:
+	if int(data['f_u'])==pid:
 		#用户1
-		user_key=4
+		user_key='f_p'
 		userPrefix = 'f_'
-	elif int(data[2])==pid:
+	elif int(data['s_u'])==pid:
 		#用户2
-		user_key=5
+		user_key='s_p'
 		userPrefix = 's_'
-	elif int(data[3])==pid:
+	elif int(data['t_u'])==pid:
 		#用户3
-		user_key=6
+		user_key='t_p'
 		userPrefix = 't_'
 	for x in puke:
 		if x not in data[user_key]:
 			return {'s':-2,'m':'您没有此牌'}
 	#判断牌是否合法并返回牌类型
 	pukeType = checkPukeType(puke)
+	print 'pukeType=',pukeType
 	if pukeType==False or pukeType==0:
 		return {'s':-2,'m':u'出牌不合法，请重出'}
-	#开始判断是否与数据库中的牌型同步
-	if pukeType!=int(data[13]) and int(data[13])>0 and pukeType!=3 and pukeType!=6:
+	#开始判断是否与数据库中的牌型同步:wtx-卡在这里
+	if pukeType!=int(data['puke_type']) and int(data['puke_type'])>0 and pukeType!=3 and pukeType!=6:
 		return {'s':-2,'m':u'牌型不符'}
-	if int(data[13])==0:#可以出任意合法的牌
+	if int(data['puke_type'])==0:#可以出任意合法的牌
 		return outPuke(pid,puke,userPrefix)
+
+
 	#判断当前最大牌是否是他本人
-	if data[17]==None:
+	if data['now_pid']==None:
 		now_pid = 0
 	else:
-		now_pid = int(data[17])
+		now_pid = int(data['now_pid'])
 	if pid==now_pid:
 		#如果是最大的牌是自己，可以出任意合法的牌
 		return outPuke(pid,puke,userPrefix)
 	#判断是否有最大牌，如果有，就需要比较两个牌组的大小，否则直接成功
-	if data[13]!=0:
-		if data[14]!=None and data[14]!='':
-			max_puke = data[14].split(',')
+	if data['puke_type']!=0:
+		if data['max_puke']!=None and data['max_puke']!='':
+			max_puke = data['max_puke'].split(',')
 			if len(max_puke)>0:
 				#比较大小
-				if data[13]==1:#单牌
+				if data['puke_type']==1:#单牌
 					if pukeType!=1 and pukeType!=3 and pukeType!=6:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
 					if pukeType==3 or pukeType==6:
@@ -686,7 +698,7 @@ def showPuke(pid, puke,pukeData):
 							return outPuke(pid,puke,userPrefix)
 						else:
 							return {'s':-2,'m':u'您出的牌未大过上家'}
-				if data[13]==2:#对子
+				if data['puke_type']==2:#对子
 					if pukeType!=2 and pukeType!=3 and pukeType!=6:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
 					if pukeType==3 or pukeType==6:
@@ -698,9 +710,9 @@ def showPuke(pid, puke,pukeData):
 							return outPuke(pid,puke,userPrefix)
 						else:
 							return {'s':-2,'m':u'您出的牌未大过上家'}
-				if data[13]==3:#王炸
+				if data['puke_type']==3:#王炸
 					return {'s':-2,'m':u'您出的牌未大过上家'}
-				if data[13]==4:#三不带
+				if data['puke_type']==4:#三不带
 					if pukeType!=4 and pukeType!=3 and pukeType!=6:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
 					if pukeType==3 or pukeType==6:
@@ -712,7 +724,7 @@ def showPuke(pid, puke,pukeData):
 							return outPuke(pid,puke,userPrefix)
 						else:
 							return {'s':-2,'m':u'您出的牌未大过上家'}
-				if data[13]==5:#三带一
+				if data['puke_type']==5:#三带一
 					if pukeType!=5 and pukeType!=3 and pukeType!=6:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
 					if pukeType==3 or pukeType==6:
@@ -731,14 +743,14 @@ def showPuke(pid, puke,pukeData):
 							return outPuke(pid,puke,userPrefix)
 						else:
 							return {'s':-2,'m':u'您出的牌未大过上家'}
-				if data[13]==6:#炸弹
+				if data['puke_type']==6:#炸弹
 					if pukeType!=6 and pukeType!=3:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
 					if pukeData[puke[0]]>pukeData[max_puke[0]] or pukeType==3:
 						return outPuke(pid,puke,userPrefix)
 					else:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
-				if data[13]==7:#顺子
+				if data['puke_type']==7:#顺子
 					if pukeType!=7 and pukeType!=3 and pukeType!=6:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
 					if pukeType==3 or pukeType==6:
@@ -756,7 +768,7 @@ def showPuke(pid, puke,pukeData):
 							return outPuke(pid,puke,userPrefix)
 						else:
 							return {'s':-2,'m':u'您出的牌未大过上家'}
-				if data[13]==8:#连对
+				if data['puke_type']==8:#连对
 					if pukeType!=8 and pukeType!=3 and pukeType!=6:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
 					if pukeType==3 or pukeType==6:
@@ -774,7 +786,7 @@ def showPuke(pid, puke,pukeData):
 							return outPuke(pid,puke,userPrefix)
 						else:
 							return {'s':-2,'m':u'您出的牌未大过上家'}
-				if data[13]==9:#四带1
+				if data['puke_type']==9:#四带1
 					if pukeType!=9 and pukeType!=3 and pukeType!=6:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
 					if pukeType==3 or pukeType==6:
@@ -792,7 +804,7 @@ def showPuke(pid, puke,pukeData):
 							return outPuke(pid,puke,userPrefix)
 						else:
 							return {'s':-2,'m':u'您出的牌未大过上家'}
-				if data[13]==10:#四带对
+				if data['puke_type']==10:#四带对
 					if pukeType!=10 and pukeType!=3 and pukeType!=6:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
 					if pukeType==3 or pukeType==6:
@@ -810,7 +822,7 @@ def showPuke(pid, puke,pukeData):
 							return outPuke(pid,puke,userPrefix)
 						else:
 							return {'s':-2,'m':u'您出的牌未大过上家'}
-				if data[13]==11:#四带2
+				if data['puke_type']==11:#四带2
 					if pukeType!=11 and pukeType!=3 and pukeType!=6:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
 					if pukeType==3 or pukeType==6:
@@ -828,7 +840,7 @@ def showPuke(pid, puke,pukeData):
 							return outPuke(pid,puke,userPrefix)
 						else:
 							return {'s':-2,'m':u'您出的牌未大过上家'}
-				if data[13]==12:#三带二
+				if data['puke_type']==12:#三带二
 					if pukeType!=12 and pukeType!=3 and pukeType!=6:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
 					if pukeType==3 or pukeType==6:
@@ -846,7 +858,7 @@ def showPuke(pid, puke,pukeData):
 							return outPuke(pid,puke,userPrefix)
 						else:
 							return {'s':-2,'m':u'您出的牌未大过上家'}
-				if data[13]==13:#飞机1
+				if data['puke_type']==13:#飞机1
 					if pukeType!=13 and pukeType!=3 and pukeType!=6:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
 					if pukeType==3 or pukeType==6:
@@ -866,7 +878,7 @@ def showPuke(pid, puke,pukeData):
 							return outPuke(pid,puke,userPrefix)
 						else:
 							return {'s':-2,'m':u'您出的牌未大过上家'}
-				if data[13]==14:#飞机2,带单的飞机
+				if data['puke_type']==14:#飞机2,带单的飞机
 					if pukeType!=14 and pukeType!=3 and pukeType!=6:
 						return {'s':-2,'m':u'您出的牌未大过上家'}
 					if pukeType==3 or pukeType==6:
@@ -892,15 +904,16 @@ def mustPuke(pid):
 	'''必须出'''
 	pid = int(pid)
 	mysqlObj = MysqlObject()
-	data = mysqlObj.getOne('mn', 'select f_u,s_u,t_u,f_p,s_p,t_p,room_id,puke_type,now_pid from mn_room where spend=3 and timer_pid=%s and now_pid is null', [pid])
-	if data==False or data==None or data[0]=='':
+	data = mysqlObj.getOneDict('mn', 'select f_u,s_u,t_u,f_p,s_p,t_p,room_id,puke_type,now_pid from mn_room where spend=3 and timer_pid=%s and now_pid is null', [pid])
+
+	if data==False or data==None or data['f_u']=='':
 		return {'s':-1,'m':u'游戏不存在'}
-	if pid==int(data[0]):
-		puke = data[3].split(',')
-	if pid==int(data[1]):
-		puke = data[4].split(',')
-	if pid==int(data[2]):
-		puke = data[5].split(',')
+	if pid==int(data['f_u']):
+		puke = data['f_p'].split(',')
+	if pid==int(data['s_u']):
+		puke = data['s_p'].split(',')
+	if pid==int(data['t_u']):
+		puke = data['t_p'].split(',')
 	if len(puke)<1:
 		return {'s':-1,'m':u'游戏已结束'}
 	puke = sortPuke(puke)
@@ -913,30 +926,32 @@ def unOutPuke(pid):
 	pid = int(pid)
 	mysqlObj = MysqlObject()
 	#判断用户位置
-	data = mysqlObj.getOne('mn', 'select f_u,s_u,t_u,room_id,puke_type,now_pid from mn_room where spend=3 and timer_pid=%s', [pid])
-	if data==False or data==None or data[0]=='':
+	data = mysqlObj.getOneDict('mn', 'select f_u,s_u,t_u,room_id,puke_type,now_pid from mn_room where spend=3 and timer_pid=%s', [pid])
+	#f_u-0,s_u,t_u,
+	#room_id-3,puke_type,now_pid
+	if data==False or data==None or data['f_u']=='':
 		return {'s':-1,'m':u'游戏不存在'}
-	if data[4]==0 or data[4]==None:
+	if data['puke_type']==0 or data['puke_type']==None:
 		return {'s':-2,'m':u'您必须出牌'}
-	if data[5]==None:
+	if data['now_pid']==None:
 		return {'s':-2,'m':u'您必须出牌'}
-	if int(data[0])==pid:
+	if int(data['f_u'])==pid:
 		nowUser = 'f_u'
-		nextUser = int(data[1])
+		nextUser = int(data['s_u'])
 		nextU = 's_u'
-	if int(data[1])==pid:
+	if int(data['s_u'])==pid:
 		nowUser = 's_u'
-		nextUser = int(data[2])
+		nextUser = int(data['t_u'])
 		nextU = 't_u'
-	if int(data[2])==pid:
+	if int(data['t_u'])==pid:
 		nowUser = 't_u'
-		nextUser = int(data[0])
+		nextUser = int(data['f_u'])
 		nextU = 'f_u'
-	u = [data[0],data[1],data[2]]
-	if nextUser==int(data[5]):
-		mysqlObj.update('mn', 'update mn_room set timer=%s,timer_pid=%s,puke_type=0,now_pid=null,max_puke=null where room_id=%s', [int(time.time()), nextUser,data[3]])
+	u = [data['f_u'],data['s_u'],data['t_u']]
+	if nextUser==int(data['now_pid']):
+		mysqlObj.update('mn', 'update mn_room set timer=%s,timer_pid=%s,puke_type=0,now_pid=null,max_puke=null where room_id=%s', [int(time.time()), nextUser,data['room_id']])
 	else:
-		mysqlObj.update('mn', 'update mn_room set timer=%s,timer_pid=%s where room_id=%s', [int(time.time()), nextUser,data[3]])
+		mysqlObj.update('mn', 'update mn_room set timer=%s,timer_pid=%s where room_id=%s', [int(time.time()), nextUser,data['room_id']])
 
 	unOutDict = {'s':1,'c':2013, 'p':nowUser}
 	GlobalObject().netfactory.pushObject(3,showDict(unOutDict),u)

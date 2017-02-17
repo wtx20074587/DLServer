@@ -116,6 +116,7 @@ def createroom():
 
 def getNextUser(dz_user,timer_pid, room_id, u):
 	'''处理下一个响应PID的用户'''
+	print 'wtx qdzing??'
 	mysqlObj = MysqlObject()
 	#首先获取timer_pid的用户，并计算出dz_user数量然后进行轮回
 	dz_user_l = dz_user
@@ -187,18 +188,25 @@ def gameTimer():
 		time.sleep(2)
 		#业务逻辑思路是，查询数据库所有状态为2的房间，读出time值，然后根据PID来进行确定到底该谁抢地主
 		roomList = mysqlObj.getAll('mn', 'select room_id,timer_pid,now_pid from mn_room where spend=3 and timer<%s',[int(time.time())-30])
+		print 'wtx roomList=',roomList,'type=',type(roomList)
+		'''
+		wtx roomList= ({'timer_pid': 1L, 'now_pid': 0L, 'room_id': 503L},) type= <type 'tuple'>
+		'''
+
 		if roomList==False or roomList[0]=='':
 			continue
 		for x in roomList:
-			if x[2]!=None:
-				now_pid=int(x[2])
-			if x[2]==None:
-				GlobalObject().root.callChild('net','nextmustpuke_205',int(x[1]))
+			#x是dict:{'timer_pid': 1L, 'now_pid': 0L, 'room_id': 503L}
+			#room_id-0,timer_pid-1,now_pid-2
+			if x['now_pid']!=None:
+				now_pid=int(x['now_pid'])
+			if x['now_pid']==None:
+				GlobalObject().root.callChild('net','nextmustpuke_205',int(x['timer_pid']))
 			else:
-				if int(x[1])==now_pid:
+				if int(x['timer_pid'])==now_pid:
 					#清空pid
-					mysqlObj.update('mn','update mn_room set now_pid=null,puke_type=0,max_puke=null where room_id=%s',[x[0]])
+					mysqlObj.update('mn','update mn_room set now_pid=null,puke_type=0,max_puke=null where room_id=%s',[x['room_id']])
 					print '*'*5,11111,'*'*5
-					GlobalObject().root.callChild('net','nextmustpuke_205',int(x[1]))
+					GlobalObject().root.callChild('net','nextmustpuke_205',int(x['timer_pid']))
 					continue
-				GlobalObject().root.callChild('net','nextoutpuke_204',int(x[1]))
+				GlobalObject().root.callChild('net','nextoutpuke_204',int(x['timer_pid']))

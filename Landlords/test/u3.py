@@ -1,4 +1,4 @@
-#coding:ansi
+#coding:utf8
 
 import time,threading,random,json
 
@@ -11,14 +11,14 @@ import struct,sys
 logging.basicConfig(level=logging.DEBUG,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                 datefmt='%a, %d %b %Y %H:%M:%S',
-                filename='user_5.log',
+                filename='user3.log',
                 filemode='w')
 # 基本参数
 HOST='52.199.191.77'
 PORT=843
 BUFSIZE=1024
 ADDR=(HOST , PORT)
-CURRENTUSER = 5
+CURRENTUSER = 3
 TIMERGAP = 10
 # 指令类型
 LOGIN = 1 #登录
@@ -92,9 +92,11 @@ def joinGame(): #登录之后，请求
     send(joinGameMsg, HANDLE)
 
 def qdz(): # 抢地主
+    print 'qdz'
     send(qdzMsg, HANDLE)
 
 def unqdz(): # 不抢地主
+    print 'unqdz'
     send(unqdzMsg, HANDLE)
 
 def startHeart(): #开始心跳
@@ -109,8 +111,15 @@ def deal(): #请求发牌
     send(dealMsg,DEAL)
 
 def puke(aPuke): # 用户出牌
-    pukeMsg = "[2,[3, "+ aPuke +"]]"
-    print "pukeMsg=",pukeMsg
+    '''
+    :param aPuke:这是一个字符串
+    :return: ！！！！！这个非常重要！！！！！
+    pukeMsg 一定是一个能被json转换成python对象的str类型。比如：传递python的list类型，需要先转换成str，然后服务器接收之后，再将str转化成list对象。
+    '''
+    #pukeMsg = "[2,[3,'"+ str(aPuke) +"']]" #wtx:这种方式是错误的！正确的方法见下面
+    pukeMsg = [2,[3,str(aPuke)]]
+    pukeMsg = json.dumps(pukeMsg)
+    print "puke, pukeMsg=",pukeMsg
     send(pukeMsg,HANDLE)
 
 def unpuke(): # 用户跳过出牌：不出
@@ -155,7 +164,7 @@ def autoStart(message):
             f_p = message['f_p']
             s_p = message['s_p']
             t_p = message['t_p']
-            # 1.先把当前用户的牌取出来，看是否含有h5
+            # 1.先把当前用户的牌取出来，看是否含有s5
             if isinstance(f_p, list):
                 currentpuke = f_p #取出当前用户的牌，和当前用户的"用户名"
                 currentUser = 'f_p'
@@ -165,20 +174,33 @@ def autoStart(message):
             if isinstance(t_p, list):
                 currentpuke = t_p
                 currentUser = 't_p'
-            # 2.如果含有h5，当前用户就是地主；否则不是地主。之后：地主响应出牌 非地主：收到别人出牌信息后，响应不出牌
-            if 'h5' in currentpuke:
+            # 2.如果含有s5，当前用户就是地主；否则不是地主。之后：地主响应出牌 非地主：收到别人出牌信息后，响应不出牌
+            if 's5' in currentpuke:
                 amIDzUser = True
                 qdz() #只让摸到红桃5的人抢地主
             else:
                 amIDzUser = False
                 unqdz()#其他人都不抢地主
+            print 'CURRENTUSER=',currentUser
+        elif message['c'] == 2000:#系统分配带有s5的用户首先响应抢地主：那么：（1）当前已经收到牌了，所以认为包含s5的就是地主（2）当前用户（系统后台写pid，client端写p）
+            sysUser = message['p']
+            print 'sysUser=',sysUser,'currentUser=',currentUser
+            if amIDzUser == True:
+                qdz()
+            elif amIDzUser == False:
+                unqdz()
+        elif message['c'] == 2002:
+            theLast3Pukes = message['p']
+            print '最后的3张牌',theLast3Pukes
         elif message['c'] == 2003:#抢地主成功，更新地主牌
             currentpuke = message['p']
+            print '9999999999999999 currentp=',currentpuke
             #然后先出一张牌，让游戏进入循环：不然不会收到2011数据
             puke(currentpuke[0])
             currentpuke.remove(currentpuke[0])
         elif message['c'] == 2011:#收到出牌的提醒
             #1.首先判断是不是自己出牌
+            print 'message[NEXT]=',message['next'],'currentUser=',currentUser
             if message['next'] == currentUser:
                 if amIDzUser == True:
                     if len(currentpuke) > 0:  # we have more than 1 puke
