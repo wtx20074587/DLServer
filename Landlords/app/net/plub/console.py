@@ -29,18 +29,19 @@ def console_3(_conn,data):
 				return showMsg(1, '')
 			else:
 				if isOK['s']==-1:
-					return showDict({'s':-1, 'm':isOK['m'],'c':2005})
+					return showDict({'s':-1, 'm':isOK['m'],'c':2005}) #wtx:只有抢地主错误，才会返回带m的信息
 				else:
 					return showDict({'s':-1, 'm':isOK['m'],'c':2006})
 		elif data[1][0]==2:
-			#不抢
+			#不抢地主
 			isOK = unQDZ(_sessionno)
 			if isOK['s']==1:
 				return showMsg(1, '')
 			else:
 				return showDict({'s':-1, 'm':isOK['m'],'c':2007})
 		elif data[1][0]==3:
-			isOK = showPuke(_sessionno, data[1][1],pukeData) #wtx:出牌
+			#出牌
+			isOK = showPuke(_sessionno, data[1][1],pukeData)
 			if isOK['s']==1:
 				return showMsg(1, '')
 			else:

@@ -41,7 +41,11 @@ def removeHeart():
 				GlobalObject().root.callChild('net','clearclient_200',x)
 
 def createroom():
-	'''创建房间定时器'''
+	'''创建房间定时器
+	TODO:
+	1.目前的房间创建是自动选择已经准备的用户，但是需要实现：（1）用户自定义房间，然后其他用户选择该房间，进入之后再开始抢地主
+	2.将所有的数据库返回的list转化成dict
+	'''
 	mysqlObj = MysqlObject()
 	room_type=[1,2,3,4]
 	while True:
@@ -81,9 +85,9 @@ def createroom():
 				returnData['s'] = 1 
 				returnData['c'] = 1000 #指令号1000
 				if y==0:
-					returnData['f_p'] = pukeList[0]		#first	1
+					returnData['f_p'] = pukeList[0]		#first	1 :如果当前用户是first用户，将first用户的牌直接给他。
 				else:
-					returnData['f_p'] = len(pukeList[0])
+					returnData['f_p'] = len(pukeList[0]) # 当前用户不是first用户，将first用户的牌的数量告诉他
 				if y==1:
 					returnData['s_p'] = pukeList[1]		#second	2
 				else:
@@ -98,9 +102,9 @@ def createroom():
 				#调用发牌异步方法
 				GlobalObject().root.callChild('net','sendpuke_201',[pidList[y]['pid']],showDict(returnData))
 			#初始化抢地主
-			returnData = {'s':1, 'c':2000}
+			returnData = {'s':1, 'c':2000} #wtx:当收到2000信息时，告知用户可以抢地主了
 			if 's5' in ','.join(pukeList[0]):
-				nextUser = roomUserList[0]
+				nextUser = roomUserList[0] #wtx:如果该用户首先抢地主，那么更新timer_pid为当前用户（即该用户开启倒计时30s）
 				returnData['p'] = 'f_u'
 			elif 's5' in ','.join(pukeList[1]):
 				nextUser = roomUserList[1]
@@ -111,7 +115,7 @@ def createroom():
 			else:
 				nextUser = roomUserList[0]
 				returnData['p'] = 'f_u'
-			mysqlObj.update('mn', 'update mn_room set timer=%s,timer_pid=%s,spend=2 where room_id=%s', [int(time.time()),nextUser,room_id])
+			mysqlObj.update('mn', 'update mn_room set timer=%s,timer_pid=%s,spend=2 where room_id=%s', [int(time.time()),nextUser,room_id]) #更新房间状态：抢地主状态
 			GlobalObject().root.callChild('net','dzpid_202',[roomUserList[0],roomUserList[1],roomUserList[2]],showDict(returnData))
 
 def getNextUser(dz_user,timer_pid, room_id, u):
@@ -167,18 +171,18 @@ def seizeTimer():
 		if roomList==False or roomList[0]=='':
 			continue
 		for x in roomList:
-			if x[1]=='':
+			if x['dz_user']=='':
 				#全部放弃了
 				continue
 			else:
-				roomInfo = mysqlObj.getOne('mn', 'select f_u,s_u,t_u,timer_pid,dz_pid from mn_room where room_id=%s', [int(x[0])])
-				if roomInfo==False or roomInfo[0]=='':
+				roomInfo = mysqlObj.getOneDict('mn', 'select f_u,s_u,t_u,timer_pid,dz_pid from mn_room where room_id=%s', [int(x['room_id'])])
+				if roomInfo==False or roomInfo['f_u']=='':
 					continue
-				if roomInfo[3]==roomInfo[4]:
+				if roomInfo['timer_pid']==roomInfo['dz_pid']:
 					#轮到他自己抢地主，就开始进行游戏了，分发地主牌并响应地主的倒计时,由客户请求触发
 					continue
 				else:
-					getNextUser(x[1], int(roomInfo[3]), x[0],[int(roomInfo[0]),int(roomInfo[1]),int(roomInfo[2])])
+					getNextUser(x['dz_user'], int(roomInfo['timer_pid']), x['room_id'],[int(roomInfo['f_u']),int(roomInfo['s_u']),int(roomInfo['t_u'])])
 					continue
 
 def gameTimer():
@@ -189,15 +193,11 @@ def gameTimer():
 		#业务逻辑思路是，查询数据库所有状态为2的房间，读出time值，然后根据PID来进行确定到底该谁抢地主
 		roomList = mysqlObj.getAll('mn', 'select room_id,timer_pid,now_pid from mn_room where spend=3 and timer<%s',[int(time.time())-30])
 		print 'wtx roomList=',roomList,'type=',type(roomList)
-		'''
-		wtx roomList= ({'timer_pid': 1L, 'now_pid': 0L, 'room_id': 503L},) type= <type 'tuple'>
-		'''
 
-		if roomList==False or roomList[0]=='':
+		if roomList==False or roomList[0]=='': #getAll返回tuple
 			continue
 		for x in roomList:
 			#x是dict:{'timer_pid': 1L, 'now_pid': 0L, 'room_id': 503L}
-			#room_id-0,timer_pid-1,now_pid-2
 			if x['now_pid']!=None:
 				now_pid=int(x['now_pid'])
 			if x['now_pid']==None:

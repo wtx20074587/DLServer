@@ -277,7 +277,6 @@
 							GameView.getInstance().user.handleContainer.updateShow(5);
 							break;
 						case 2017://用户错误强行断开用户
-							
 							break;
 					}
 				}

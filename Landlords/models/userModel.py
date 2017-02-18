@@ -113,7 +113,7 @@ def beginGame(room_id):
 	if u.index(isInGame['dizhu_pid'])==0:
 		f_p = isInGame['f_p']+','+isInGame['d_z'] #如果f_u是地主，那么更新f_p的牌，即：f_p
 		returnData = {'s':1, 'c':2002, 'd_z':isInGame['d_z'].split(','),'dz_u':'f_u'} #isInGame['d_z']是地主牌
-		GlobalObject().netfactory.pushObject(3,showDict({'s':1,'c':2003,'p':f_p.split(',')}),[isInGame['dizhu_pid']]) #!!wtx风险：这里会泄露地主的牌型么？？
+		GlobalObject().netfactory.pushObject(3,showDict({'s':1,'c':2003,'p':f_p.split(',')}),[isInGame['dizhu_pid']]) #wtx：这里会泄露地主的牌型么？——不会，只通知地主用户
 		mysqlObj.update('mn', 'update mn_room set f_p=%s,timer=%s,timer_pid=%s,dz_pid=%s,spend=3 where room_id=%s', [f_p, int(time.time()),isInGame['dizhu_pid'],isInGame['dizhu_pid'],room_id])
 	elif u.index(isInGame['dizhu_pid'])==1:
 		s_p = isInGame['s_p']+','+isInGame['d_z']
