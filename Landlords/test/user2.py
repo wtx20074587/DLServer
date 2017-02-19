@@ -11,14 +11,14 @@ import struct,sys
 logging.basicConfig(level=logging.DEBUG,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                 datefmt='%a, %d %b %Y %H:%M:%S',
-                filename='u1.log',
+                filename='u2.log',
                 filemode='w')
 # 基本参数
 HOST='13.113.30.58'
 PORT=843
 BUFSIZE=1024
 ADDR=(HOST , PORT)
-CURRENTUSER = 1
+CURRENTUSER = 2
 TIMERGAP = 10
 # 指令类型
 LOGIN = 1 #登录

@@ -5,7 +5,7 @@ import time,threading,random,json
 from socket import AF_INET,SOCK_STREAM,socket
 from thread import start_new
 import struct,sys
-HOST='52.199.191.77'
+HOST='13.113.30.58'
 PORT=843
 BUFSIZE=1024
 ADDR=(HOST , PORT)

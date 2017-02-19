@@ -257,7 +257,7 @@ def game_settle(room_id, u, leavepid=0):
 		elif data['t_p']=='':
 			userindex = 2
 		else:
-			return {'s':-3,'m':'该游戏未结束'}
+			return {'s':-3,'m':'该游戏已结束'} #wtx:未结束改为已结束
 		#获取胜利者PID
 		winnerPid = u[userindex]
 
@@ -927,8 +927,7 @@ def unOutPuke(pid):
 	mysqlObj = MysqlObject()
 	#判断用户位置
 	data = mysqlObj.getOneDict('mn', 'select f_u,s_u,t_u,room_id,puke_type,now_pid from mn_room where spend=3 and timer_pid=%s', [pid])
-	#f_u-0,s_u,t_u,
-	#room_id-3,puke_type,now_pid
+
 	if data==False or data==None or data['f_u']=='':
 		return {'s':-1,'m':u'游戏不存在'}
 	if data['puke_type']==0 or data['puke_type']==None:
