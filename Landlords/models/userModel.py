@@ -134,9 +134,6 @@ def removeGame(room_id):
 	mysqlObj = MysqlObject()
 	isInGame = mysqlObj.getOneDict('mn','select room_id,dizhu_pid,timer_pid,multiple,dz_user,f_u,s_u,t_u from mn_room where room_id=%s', [room_id])
 
-	#if(type(isInGame)=='dict'): #deleted by wtx 20170215
-		#isInGame = isInGame.values() #deleted by wtx 20170215
-
 	u = [int(isInGame['f_u']), int(isInGame['s_u']),int(isInGame['t_u'])]
 	pukeList = shufflingLicensing()
 	#发送信息
@@ -993,11 +990,11 @@ def joinQueue(pid,room_type):
 		isInGame = mysqlObj.getOne('mn','select count(id) as a from mn_room where f_u=%s or s_u=%s or t_u=%s', [pid])
 		if isInGame==False or isInGame[0]<1:
 			mysqlObj.insertOne('mn', 'insert into mn_gamequeue (pid,room_type) values (%s,%s)',[pid,room_type])
-			return {'s':1,'m':''}	#flash操作号1001
+			return {'s':1,'m':''}	#flash操作号1001 # showMsg(1,'')
 		else:
-			return {'s':-1,'m':'您已经在游戏队列中了'}
+			return {'s':-1,'m':'您已经在游戏队列中了'}# showMsg(-1,'您已经在游戏队列中了')
 	else:
-		return {'s':-1,'m':'您已经在游戏队列中了'}
+		return {'s':-1,'m':'您已经在游戏队列中了'}# showMsg(-1,'您已经在游戏队列中了')
 
 def outQueue(pid):
 	'''离开游戏队列'''

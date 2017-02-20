@@ -165,14 +165,20 @@ def autoStart(message):
     if s == 1:#Correct Status
         try:
             c = message['c']
-            if c==1001:#(1)用户请求加入游戏队列之后：加入游戏队列成功 —— ps：相当于点击“准备”，之后返回该信息，说明准备成功(2)其他情况：该信号有重叠
+            if c==1001:#(1)用户请求加入游戏队列之后：加入游戏队列成功 —— ps：相当于点击“准备”，之后返回该信息，说明准备成功
+                #（1）{'s':1,'c':1001} —— 加入游戏队列成功，只有s，c字段
+                #（2）{'s':-1,'m':XXX} —— 加入游戏队列失败！ 只有s,m字段。
                 logging.debug('加入游戏队列成功'+message)
                 if message['d'] != False:
                     logging.debug('获取用户信息成功'+message['d'])
             elif c == 1002:#用户离开游戏队列 —— ps：相当于点击 “取消准备”，之后返回该信息，说明退出成功
+                #（1）{'s':1,'c':1002} —— 离开游戏队列成功，只有s,c字段
+                #（2）{'s':-1,'m':'您不在队列中'} —— 离开游戏队列失败，只有s,m字段。
                 logging.debug('离开游戏队列成功'+message)
             elif c == 1000:
                 #1.系统发牌成功，先将各自的牌（或数量）取出来
+                #（1）{'s':1,'c':1000,'f_p':XXX,'s_p':XXX,'t_p':XXX,'d':XXX} —— f_p,s_p,t_p:分别是第1,2,3个玩家的牌（或牌数量），比如，当前玩家1收到的信息是：
+                #      f_p:系统发给自己的牌，s_p,t_p：第2,3个玩家的牌的数量（斗地主就是默认17）；d：地主牌数量（3人斗地主默认3张）
                 f_p = message['f_p'] #如果当前用户就是f_p,那么f_p就是系统发给他牌，相应的：s_p,t_p就是另外2个用户的牌的数量了。d就是地主牌的数量
                 s_p = message['s_p']
                 t_p = message['t_p']
@@ -195,7 +201,8 @@ def autoStart(message):
                 else:
                     print '我不是地主'
             elif c == 2000: #系统开启抢地主
-                #{'s':1, 'c':2000, 'p':XXX}
+                #（1）{'s':1, 'c':2000, 'p':XXX} —— 抢地主信息，p：抢地主的用户，例如，如果p字段是't_u'就说明第3个玩家抢地主了。
+                #（2）{'s':1, 'c':2000,'n_u':nowUser,'f':fen,'p':XXX} ——
                 whichOneShouldRespond = message['p']
                 if whichOneShouldRespond == currentUser: # 1.PS:此时才是真正的开始抢地主哦。
                     amIDzUser = True
@@ -212,18 +219,23 @@ def autoStart(message):
                     unqdz()
 
             elif c == 2001: #没人抢地主，重新发牌
-                #{'s':1, 'c':2001, 'f_p':pukeList[0],'s_p':17,'t_p':17,'d_z':3}
+                #（1）{'s':1, 'c':2001, 'f_p':pukeList[0],'s_p':17,'t_p':17,'d_z':3} —— 重新发牌，当前玩家会收到系统发给自己的牌，以及其他玩家牌的数量和地主牌的数量。
                 #1.重新发牌，做个动画吧
                 currentpuke = message[currentUser] #取出当前用户的牌。其他用户的牌就不取出来了。
                 logging.debug("没人抢地主，重新发牌.,message="+message)
+
             elif c == 2002:
-                #{'s':1, 'c':2002, 'd_z':isInGame['d_z'].split(','),'dz_u':'XXXX'} #该用户会收到自己的信息
+                #{'s':1, 'c':2002, 'd_z':isInGame['d_z'].split(','),'dz_u':'XXXX'} #抢地主完成
+                #   该玩家没有抢到地主，因此会收到该消息：d_z字段就是最后的3张地主牌；dz_u:抢到地主的玩家
+
                 theLast3pukes = message['d_z'] # 如果当前用户不是地主，那么只会看到最后的3张地主牌
                 print '3张地主牌是：',theLast3pukes,'地主用户是：',message['dz_u']
                 #1.如果是地主用户，此时可以开始了么？
                 logging.debug("选出地主来啦：地主是"+message['dz_u']+" ,message="+message)
+
             elif c == 2003: #只有地主用户才能收到2003的消息：
-                #{'s':1,'c':2003,'p':t_p.split(',')}
+                #{'s':1,'c':2003,'p':t_p.split(',')} —— 抢地主完成
+                #  该玩家抢到地主了，因此会收到该消息。字段p：最后的3张地主牌，混合系统原来分配给他的17张牌，共计20张牌给地主。
                 currentpuke = message['p'] # 该用户是地主，最后的3张地主牌，已经混合了原来的17张牌。共计20张牌给地主。
                 print "我就是地主，地主就是我，我的牌是：",currentpuke
                 print "\n\n先出一张牌！\n\n"
@@ -233,20 +245,24 @@ def autoStart(message):
                     currentpuke.remove(currentpuke[0])
 
             elif c == 2004: #用户x不抢地主
-                # {'s': 1, 'c': 2004, 'n_u': nowUser}
+                # {'s': 1, 'c': 2004, 'n_u': nowUser} —— nowUser不抢地主
                 nowUser = message['n_u']
                 print '用户：'+nowUser+' 就是不NOOOO去抢地主！\n\n'
 
             elif c == 2010:#报警数据，某个用户的牌剩余不到2张
-                #{'s':1,'m':'还剩'+str(len(upd_puke))+'张牌了','n':nowUser,'c':2010,'mp3':'clock.mp3'}
+                #{'s':1,'m':'还剩'+str(len(upd_puke))+'张牌了','n':nowUser,'c':2010,'mp3':'clock.mp3'}  —— mp3字段是提示播放某某音乐，client可以自定义。
                 warningMsg = message['m']
                 nowUser = message['n']
                 print 'User:'+nowUser+'  '+warningMsg
                 logging.debug("我快出完啦!!,message="+message)
 
             elif c == 2011:#用户的出牌数据
-                #{'s':1,'p':puke,'n':nowUser, 'c':2011,'next':nextUser, 'mp3':music}
-                #{'s':1,'p':'','n':nowUser, 'c':2011,'next':nextU, 'mp3':'NO'+str(random.randint(1,4))+'.mp3'}
+                #{'s':1,'p':puke,'n':nowUser, 'c':2011,'next':nextUser, 'mp3':music} ——
+                #  n：刚出牌的用户；
+                #  p：刚出的牌
+                #  next： 下一个出牌的用户
+                #  mp3: 提示音乐
+
                 nowUser = message['n']
                 p = message['p']
                 nextUser = message['next']
@@ -267,9 +283,15 @@ def autoStart(message):
                     else :
                         unpuke()
                 #2.如果没轮到自己出牌，就看别人出吧
+
             elif c == 2012: #一盘结束，计算最终的结果，返回给用户
                 #PS:默认的初始化用户好像都没钱！
                 #{'s':1,'m':'游戏已结束','c':2012,'w':winS,'l':losS,'d':upset,'losemoney':losMoney,'winmoney':winMoney}
+                # w：赢的人
+                # l： 输的人
+                # losMoney，winMoney：输的钱，赢的钱
+                # upset：倍数
+
                 winners = message['w']
                 losers = message['l']
                 loseMoney = message['losemoney']
@@ -280,6 +302,7 @@ def autoStart(message):
 
             elif c == 2013:#某个用户不出牌
                 #unOutDict = {'s':1,'c':2013, 'p':nowUser}
+                # p : 该用户不出牌
                 nowUser = message['p']
                 print "用户："+nowUser+"发话了，我就是不要!"
 
